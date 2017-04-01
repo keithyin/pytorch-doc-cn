@@ -34,7 +34,7 @@ dset.MNIST(root, train=True, transform=None, target_transform=None, download=Fal
 - download : `True` = 从互联网上下载数据集，并把数据集放在`root`目录下. 如果数据集之前下载过，将处理过的数据（minist.py中有相关函数）放在`processed`文件夹下。
 
 ## COCO
-需要安装`COCO API`
+需要安装[COCO API](https://github.com/pdollar/coco/tree/master/PythonAPI)
 
 关于图像标注:
 ```python
