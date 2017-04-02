@@ -1,2 +1,3 @@
+site_name: pytorch-doc-cn
 pages:
     - 主页: readme.md
