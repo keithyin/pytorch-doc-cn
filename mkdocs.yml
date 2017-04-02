@@ -1,3 +1,9 @@
 site_name: pytorch-doc-cn
 pages:
     - 主页: readme.md
+    - torchvision: torchvision/torchvision
+    - torchvision-datasets: torchvision/torchvision-datasets
+    - torchvision-models: torchvision/torchvision-models
+    - torchvision-transform: torchvision/torchvision-transform
+    - torchvision-util: torchvision/torchvision-util
+    
