@@ -1,0 +1,9 @@
+pages:
+    - ['readme.md', '主页']
+    - ['torchvision/torchvision.md', `torchvision`, `torchvision`]
+    - ['torchvision/torchvision-datasets.md', `torchvision-datasets`, `torchvision`]
+    - ['torchvision/torchvision-models.md', `torchvision-models`, `torchvision`]
+    - ['torchvision/torchvision-transform.md', 'torchvision-transform', 'torchvision']
+    - ['torchvision/torchvision-utils.md', 'torchvision-utils', 'torchvision']
+    - ['tutorial/input-pipeline.md', 'input-pipeline', 'tutorial']
+    
