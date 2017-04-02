@@ -5,4 +5,4 @@ pages:
     - torchvision-datasets: torchvision/torchvision-datasets.md
     - torchvision-models: torchvision/torchvision-models.md
     - torchvision-transform: torchvision/torchvision-transform.md
-    - torchvision-util: torchvision/torchvision-util.md
+    - torchvision-util: torchvision/torchvision-utils.md
