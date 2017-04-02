@@ -14,7 +14,7 @@ transforms.Compose([
  ```
 
 
-### class torchvision.transforms.Scale(size, interpolation=2)
+class torchvision.transforms.Scale(size, interpolation=2)
 
 将输入的`PIL.Image`重新改变大小成给定的`size`，`size`是最小边的边长。举个例子，如果原图的`height>width`,那么改变大小后的图片大小是`(size*height/width, size)`。
 **用例:**
