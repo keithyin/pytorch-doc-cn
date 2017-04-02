@@ -1,9 +1,13 @@
 site_name: pytorch-doc-cn
 pages:
     - 主页: index.md
+    - torchdoc:
+        - torch-nn: torchdoc/torch-nn.md
     - torchvision:
         - torchvision: torchvision/torchvision.md
         - torchvision-datasets: torchvision/torchvision-datasets.md
         - torchvision-models: torchvision/torchvision-models.md
         - torchvision-transform: torchvision/torchvision-transform.md
         - torchvision-util: torchvision/torchvision-utils.md
+
+theme: readthedocs
