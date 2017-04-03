@@ -163,84 +163,209 @@ Conv2d(10, 20, kernel_size=(4, 4), stride=(1, 1))
 #### named_children()
 返回 包含 模型当前子模块 的迭代器，`yield` 模块名字和模块本身。
 
-Example
+例子：
+```python
+for name, module in model.named_children():
+    if name in ['conv4', 'conv5']:
+        print(module)
+```
+#### named_modules(memo=None, prefix='')[source]
+返回包含网络中所有模块的迭代器, `yielding`  模块名和模块本身。
 
->>> for name, module in model.named_children():
->>>     if name in ['conv4', 'conv5']:
->>>         print(module)
-named_modules(memo=None, prefix='')[source]
-Returns an iterator over all modules in the network, yielding both the name of the module as well as the module itself.
+**`注意：`**
 
-Note
+重复的模块只被返回一次(`children()也是`)。 在下面的例子中, `submodule` 只会被返回一次。
 
-Duplicate modules are returned only once. In the following example, l will be returned only once.
 
->>> l = nn.Linear(2, 2)
->>> net = nn.Sequential(l, l)
->>> for idx, m in enumerate(net.named_modules()):
->>>     print(idx, '->', m)
-0 -> ('', Sequential (
-  (0): Linear (2 -> 2)
-  (1): Linear (2 -> 2)
-))
-1 -> ('0', Linear (2 -> 2))
-parameters(memo=None)[source]
-Returns an iterator over module parameters.
+#### parameters(memo=None)
+返回一个包含模型 所有参数的迭代器。
 
-This is typically passed to an optimizer.
+一般用来当作`optimizer`的参数。
 
-Example
+例子：
+```python
+for param in model.parameters():
+    print(type(param.data), param.size())
 
->>> for param in model.parameters():
->>>     print(type(param.data), param.size())
 <class 'torch.FloatTensor'> (20L,)
 <class 'torch.FloatTensor'> (20L, 1L, 5L, 5L)
-register_backward_hook(hook)[source]
-Registers a backward hook on the module.
+```
+#### register_backward_hook(hook)
 
-The hook will be called every time the gradients with respect to module inputs are computed. The hook should have the following signature:
+在`module`上注册一个`bachward hook`。
 
-hook(module, grad_input, grad_output) -> Tensor or None
-The grad_input and grad_output may be tuples if the module has multiple inputs or outputs. The hook should not modify its arguments, but it can optionally return a new gradient with respect to input that will be used in place of grad_input in subsequent computations.
+每次计算`module`的`inputs`的梯度的时候，这个`hook`会被调用。`hook`应该拥有下面的`signature`。
 
-This function returns a handle with a method handle.remove() that removes the hook from the module.
+`hook(module, grad_input, grad_output) -> Tensor or None`
+如果`module`有多个输入输出的话，那么`grad_input` `grad_output`将会是个`tuple`。
+`hook`不应该修改它的`arguments`，但是它可以选择性的返回关于输入的梯度，这个返回的梯度在后续的计算中会替代`grad_input`。
 
-register_buffer(name, tensor)[source]
-Adds a persistent buffer to the module.
+这个函数返回一个 句柄(`handle`)。它有一个方法 `handle.remove()`，可以用这个方法将`hook`从`module`移除。
 
-This is typically used to register a buffer that should not to be considered a model parameter. For example, BatchNorm’s running_mean is not a parameter, but is part of the persistent state.
+
+#### register_buffer(name, tensor)
+
+给`module`添加一个`persistent buffer`。
+
+`persistent buffer`通常被用在这么一种情况：我们需要保存一个状态，但是这个状态不能看作成为模型参数。
+例如：, `BatchNorm’s` running_mean 不是一个 `parameter`, 但是它也是需要保存的状态之一。
 
 Buffers can be accessed as attributes using given names.
+`Buffers`可以通过注册时候的`name`获取。
 
-Example
+例子：
 
->>> self.register_buffer('running_mean', torch.zeros(num_features))
-register_forward_hook(hook)[source]
+```python
+self.register_buffer('running_mean', torch.zeros(num_features))
+
+self.running_mean
+```
+
+#### register_forward_hook(hook)
 Registers a forward hook on the module.
+在`module`上注册一个`forward hook`。
+每次调用`forward()`计算输出的时候，这个`hook`就会被调用。它应该拥有以下签名：
 
-The hook will be called every time forward() computes an output. It should have the following signature:
 
-hook(module, input, output) -> None
-The hook should not modify the input or output. This function returns a handle with a method handle.remove() that removes the hook from the module.
+`hook(module, input, output) -> None`
+`hook`不应该修改 `input`和`output`. 这个函数返回一个 句柄(`handle`)。它有一个方法 `handle.remove()`，可以用这个方法将`hook`从`module`移除。
 
-register_parameter(name, param)[source]
-Adds a parameter to the module.
+#### register_parameter(name, param)
+向`module`添加 `parameter`
 
-The parameter can be accessed as an attribute using given name.
+`parameter`可以通过注册时候的`name`获取。
 
-state_dict(destination=None, prefix='')[source]
-Returns a dictionary containing a whole state of the module.
+#### state_dict(destination=None, prefix='')[source]
 
-Both parameters and persistent buffers (e.g. running averages) are included. Keys are corresponding parameter and buffer names.
+返回一个字典，保存着`module`的所有状态（`state`）。
 
-Example
+`parameters`和`persistent buffers`都会包含在字典中，字典的`key`就是`parameter`和`buffer`的 `names`。
 
->>> module.state_dict().keys()
-['bias', 'weight']
-train(mode=True)[source]
-Sets the module in training mode.
+例子：
+```python
+import torch
+from torch.autograd import Variable
+import torch.nn as nn
 
-This has any effect only on modules such as Dropout or BatchNorm.
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv2 = nn.Linear(1, 2)
+        self.vari = Variable(torch.rand([1]))
+        self.par = nn.Parameter(torch.rand([1]))
+        self.register_buffer("buffer", torch.randn([2,3]))
 
-zero_grad()[source]
-Sets gradients of all model parameters to zero.
+model = Model()
+print(model.state_dict().keys())
+
+```
+```
+odict_keys(['par', 'buffer', 'conv2.weight', 'conv2.bias'])
+```
+#### train(mode=True)
+
+将`module`设置为 `training mode`。
+
+仅仅当模型中有`Dropout`和`BatchNorm`是才会有影响。
+
+#### zero_grad()
+
+将`module`中的所有模型参数的梯度设置为0.
+
+### class torch.nn.Sequential(* args)
+一个时序容器。`Modules` 会以他们传入的顺序被添加到容器中。当然，也可以传入一个`OrderedDict`。
+
+为了更容易的理解如何使用`Sequential`, 下面给出了一个例子:
+
+```python
+# Example of using Sequential
+
+model = nn.Sequential(
+          nn.Conv2d(1,20,5),
+          nn.ReLU(),
+          nn.Conv2d(20,64,5),
+          nn.ReLU()
+        )
+# Example of using Sequential with OrderedDict
+model = nn.Sequential(OrderedDict([
+          ('conv1', nn.Conv2d(1,20,5)),
+          ('relu1', nn.ReLU()),
+          ('conv2', nn.Conv2d(20,64,5)),
+          ('relu2', nn.ReLU())
+        ]))
+```
+
+### class torch.nn.ModuleList(modules=None)[source]
+将`submodules`保存在一个`list`中。
+
+`ModuleList`可以像一般的`Python list`一样被`索引`。而且`ModuleList`中包含的`modules`已经被正确的注册，对所有的`module method`可见。
+
+
+参数说明:
+
+- modules (list, optional) – 将要被添加到`MuduleList`中的 `modules` 列表
+
+例子:
+```python
+class MyModule(nn.Module):
+    def __init__(self):
+        super(MyModule, self).__init__()
+        self.linears = nn.ModuleList([nn.Linear(10, 10) for i in range(10)])
+
+    def forward(self, x):
+        # ModuleList can act as an iterable, or be indexed using ints
+        for i, l in enumerate(self.linears):
+            x = self.linears[i // 2](x) + l(x)
+        return x
+```
+
+####  append(module)[source]
+等价于 list 的 `append()`
+
+参数说明:
+
+- module (nn.Module) – 要 append 的`module`
+#### extend(modules)[source]
+等价于 `list` 的 `extend()` 方法
+
+参数说明:
+
+- modules (list) – list of modules to append
+
+### class torch.nn.ParameterList(parameters=None)
+将`submodules`保存在一个`list`中。
+
+`ParameterList`可以像一般的`Python list`一样被`索引`。而且`ParameterList`中包含的`parameters`已经被正确的注册，对所有的`module method`可见。
+
+
+参数说明:
+
+- modules (list, optional) – a list of nn.Parameter
+
+例子:
+```python
+class MyModule(nn.Module):
+    def __init__(self):
+        super(MyModule, self).__init__()
+        self.params = nn.ParameterList([nn.Parameter(torch.randn(10, 10)) for i in range(10)])
+
+    def forward(self, x):
+        # ModuleList can act as an iterable, or be indexed using ints
+        for i, p in enumerate(self.params):
+            x = self.params[i // 2].mm(x) + p.mm(x)
+        return x
+```
+#### append(parameter)[source]
+等价于` python list` 的 `append` 方法。
+
+参数说明:
+
+- parameter (nn.Parameter) – parameter to append
+#### extend(parameters)[source]
+等价于` python list` 的 `extend` 方法。
+
+参数说明:
+
+- parameters (list) – list of parameters to append
+
+## Convolution Layers
