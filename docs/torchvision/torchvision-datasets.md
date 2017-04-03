@@ -85,7 +85,7 @@ dset.LSUN(db_path, classes='train', [transform, target_transform])
 [‘bedroom\_train’, ‘church\_train’, …] : 要加载的类别
 
 ## ImageFolder
-一个通用的数据加载器，数据集中的数据以以下方式组织
+一个通用的数据加载器，数据的目录结构以以下方式组织：
 ```
 root/dog/xxx.png
 root/dog/xxy.png

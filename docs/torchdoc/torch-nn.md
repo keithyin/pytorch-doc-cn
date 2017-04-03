@@ -369,3 +369,27 @@ class MyModule(nn.Module):
 - parameters (list) – list of parameters to append
 
 ## Convolution Layers
+
+## Pooling Layers
+
+## Non-linear Activations
+
+## Normalization layers
+
+## Recurrent layers
+
+## Linear layers
+
+## Dropout layers
+
+## Sparse layers
+
+## Distance functions
+
+## Loss functions
+
+## Vision layers
+
+## Multi-GPU layers
+
+## Utilities
