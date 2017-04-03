@@ -117,6 +117,7 @@ class Linear(nn.Module):
     def forward(self, input):
         # See the autograd section for explanation of what happens here.
         return Linear()(input, self.weight, self.bias)
+        #注意这个Linear是之前实现过的Linear
 ```
 ## 编写自定义`C`扩展
 
