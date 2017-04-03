@@ -5,7 +5,6 @@
 ## 扩展 torch.autograd
 如果你想要添加一个新的 `Operation` 到`autograd`的话，你的`Operation`需要继承 `class Function`。`autograd`使用`Function`计算结果和梯度，同时编码 `operation`的历史。每个新的 `operation(function)` 都需要实现三个方法：
 
-
 - `__init__ (optional)` - 如果你的`operation`包含非`Variable`参数，那么就将其作为`__init__`的参数传入到`operation`中。例如：`AddConstant Function`加一个常数，`Transpose Function`需要指定哪两个维度需要交换。如果你的`operation`不需要额外的参数，你可以忽略`__init__`。
 
 - `forward()` - 在里面写执行此`operation`的代码。可以有任意数量的参数。如果你对某些参数指定了默认值，则这些参数是可传可不传的。记住：`forward()`的参数只能是`Variable`。函数的返回值既可以是 `Variable`也可以是`Variables`的`tuple`。同时，请参考 `Function`的 `doc`，查阅有哪些 有用的方法是可以在 `forward` 中调用的。
