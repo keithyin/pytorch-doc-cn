@@ -20,8 +20,8 @@
 举例说明：
 `torch.utils.data.DataLoader(coco_cap, batch_size=args.batchSize, shuffle=True, num_workers=args.nThreads)`
 
-在构造函数中，不同的数据集直接的构造函数会有些许不同，但是他们共同拥有 `keyword` 参数。
-In the constructor, each dataset has a slightly different API as needed, but they all take the keyword args:
+在构造函数中，不同的数据集直接的构造函数会有些许不同，但是他们都有一些 `keyword` 参数。
+
 
 - `transform`： 一个函数，原始图片作为输入，返回一个转换后的图片。（详情请看下面关于`torchvision-tranform`的部分）
 
