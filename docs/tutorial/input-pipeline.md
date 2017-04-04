@@ -1,6 +1,17 @@
 # pytorch input-pipeline
 
+
 **input-pipeline:**
+```python
+import torch
+import torchvision
+import torch.nn as nn
+import numpy as np
+import torch.utils.data as data
+import torchvision.transforms as transforms
+import torchvision.datasets as dsets
+from torch.autograd import Variable
+```
 1. 图像预处理
 ```python
 # 创建个transform用来处理图像数据

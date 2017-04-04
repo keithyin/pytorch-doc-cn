@@ -2,11 +2,17 @@
 `torchvision.datasets`中包含了以下数据集
 
 - MNIST
+
 - COCO（用于图像标注和目标检测）(Captioning and Detection)
+
 - LSUN Classification
+
 - ImageFolder
+
 - Imagenet-12
+
 - CIFAR10 and CIFAR100
+
 - STL10
 
 `Datasets` 拥有以下`API`:
@@ -70,7 +76,10 @@ u'A plane darts across a bright blue sky behind a mountain covered in snow',
 u'A plane leaves a contrail above the snowy mountain top.',
 u'A mountain that has a plane flying overheard in the distance.',
 u'A mountain view with a plume of smoke in the background']
-Detection:
+```
+
+目标检测:
+```python
 dset.CocoDetection(root="dir where images are", annFile="json annotation file", [transform, target_transform])
 ```
 ## LSUN
