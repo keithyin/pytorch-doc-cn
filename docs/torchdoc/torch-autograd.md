@@ -205,7 +205,6 @@ This is used e.g. for indices returned from a max Function.
 如果一些 `inputs` 和 `outputs` 是共享存储空间的，所有的这样的 `(input, output)`对都应该传给这个函数，保证 `in-place operations` 检查的正确性。唯一的特例就是，当 `output`和`input`是同一个`tensor`(`in-place operations`的输入和输出)。这种情况下，就没必要指定它们之间的依赖关系，因为这个很容易就能推断出来。
 
 这个函数在很多时候都用不到。主要是用在 索引 和 转置 这类的 `op` 中。
-This function is not needed in most functions. It’s primarily used in indexing and transpose ops.
 
 #### save_for_backward(* tensors)[source]
 
