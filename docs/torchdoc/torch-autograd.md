@@ -177,41 +177,42 @@ Records operation history and defines formulas for differentiating ops.
 执行`operation`。
 
 所有的`Function`子类都需要重写这个方法。
-This function is to be overriden by all subclasses.
 
 可以接收和返回任意个数 `tensors`
-It can take and return an arbitrary number of tensors.
 
 #### mark_dirty(* args)[source]
-Marks given tensors as modified in an in-place operation.
 
-This should be called at most once, only from inside the forward() method, and all arguments should be inputs.
+将输入的 `tensors` 标记为被`in-place operation`修改过。
 
-Every tensor that’s been modified in-place in a call to forward() should be given to this function, to ensure correcness of our checks. It doesn’t matter wheter the function is called before or after modification.
+这个方法应当至多调用一次，仅仅用在 `forward`方法里，而且`mark_dirty`的实参只能是`forward`的实参。
+
+每个在`forward`方法中被`in-place operations`修改的`tensor`都应该传递给这个方法。这样，可以保证检查的正确性。这个方法在`tensor`修改前后调用都可以。
 
 #### mark_non_differentiable(* args)[source]
-Marks outputs as non-differentiable.
+将输出标记为不可微。
 
-This should be called at most once, only from inside the forward() method, and all arguments should be outputs.
+这个方法至多只能被调用一次，只能在`forward`中调用，而且实参只能是`forward`的返回值。
 
-This will mark outputs as not requiring gradients, increasing the efficiency of backward computation. You still need to accept a gradient for each output in backward(), but it’s always going to be None.
+这个方法会将输出标记成不可微，会增加`backward`过程中的效率。在`backward`中，你依旧需要接收`forward`输出值的梯度，但是这些梯度一直是`None`。
 
 This is used e.g. for indices returned from a max Function.
 
 #### mark_shared_storage(* pairs)[source]
-Marks that given pairs of distinct tensors are sharing storage.
+将给定的`tensors pairs`标记为共享存储空间。
 
-This should be called at most once, only from inside the forward() method, and all arguments should be pairs of (input, output).
+这个方法至多只能被调用一次，只能在`forward`中调用，而且所有的实参必须是`(input, output)`对。
 
-If some of the outputs are going to be tensors sharing storage with some of the inputs, all pairs of (input_arg, output_arg) should be given to this function, to ensure correctness checking of in-place modification. The only exception is when an output is exactly the same tensor as input (e.g. in-place ops). In such case it’s easy to conclude that they’re sharing data, so we don’t require specifying such dependencies.
+如果一些 `inputs` 和 `outputs` 是共享存储空间的，所有的这样的 `(input, output)`对都应该传给这个函数，保证 `in-place operations` 检查的正确性。唯一的特例就是，当 `output`和`input`是同一个`tensor`(`in-place operations`的输入和输出)。这种情况下，就没必要指定它们之间的依赖关系，因为这个很容易就能推断出来。
 
+这个函数在很多时候都用不到。主要是用在 索引 和 转置 这类的 `op` 中。
 This function is not needed in most functions. It’s primarily used in indexing and transpose ops.
 
 #### save_for_backward(* tensors)[source]
-Saves given tensors for a future call to backward().
 
-This should be called at most once, and only from inside the forward() method.
+将传入的 `tensor` 保存起来，留着`backward`的时候用。
 
-Later, saved tensors can be accessed through the saved_tensors attribute. Before returning them to the user, a check is made, to ensure they weren’t used in any in-place operation that modified their content.
+这个方法至多只能被调用一次，只能在`forward`中调用。
 
-Arguments can also be None.
+之后，被保存的`tensors`可以通过 `saved_tensors`属性获取。在返回这些`tensors`之前，`pytorch`做了一些检查，保证这些`tensor`没有被`in-place operations`修改过。
+
+实参可以是`None`。
