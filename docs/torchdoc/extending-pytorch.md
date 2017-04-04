@@ -7,8 +7,7 @@
 
 - `__init__ (optional)` - 如果你的`operation`包含非`Variable`参数，那么就将其作为`__init__`的参数传入到`operation`中。例如：`AddConstant Function`加一个常数，`Transpose Function`需要指定哪两个维度需要交换。如果你的`operation`不需要额外的参数，你可以忽略`__init__`。
 
-- `forward()` - 在里面写执行此`operation`的代码。可以有任意数量的参数。如果你对某些参数指定了默认值，则这些参数是可传可不传的。记住：`forward()`的参数只能是`Variable`。函数的返回值既可以是 `Variable`也可以是`Variables`的`tuple`。同时，请参考 `Function`的 `doc`，查阅有哪些 有用的方法是可以在 `forward` 中调用的。
-
+- `forward()` - 在里面写执行此`operation`的代码。可以有任意数量的参数。如果你对某些参数指定了默认值，则这些参数是可传可不传的。记住：`forward()`的参数只能是`Variable`。函数的返回值既可以是 `Variable`也可以是`Variables`的`tuple`。同时，请参考 `Function`[function]的 `doc`，查阅有哪些 方法是只能在`forward`中调用的。
 - `backward()` - 梯度计算公式。 参数的个数和`forward`返回值的个数一样，每个参数代表传回到此`operation`的梯度. `backward()`的返回值的个数应该和此`operation`输入的个数一样，每个返回值对应了输入值的梯度。如果`operation`的输入不需要梯度，或者不可导，你可以返回`None`。 如果`forward()`存在可选参数，你可以返回比输入更多的梯度，只是返回的是`None`。
 
 下面是 `Linear` 的实现代码：
