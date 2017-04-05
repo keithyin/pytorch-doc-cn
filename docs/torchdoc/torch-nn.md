@@ -651,7 +651,8 @@ Examples:
 
 ## Multi-GPU layers
 ### class torch.nn.DataParallel(module, device_ids=None, output_device=None, dim=0)[source]
-Implements data parallelism at the module level.
+
+在模块级别上实现数据并行。
 
 This container parallelizes the application of the given module by splitting the input across the specified devices by chunking in the batch dimension. In the forward pass, the module is replicated on each device, and each replica handles a portion of the input. During the backwards pass, gradients from each replica are summed into the original module.
 
@@ -671,49 +672,63 @@ Example:
 >>> output = net(input_var)
 ```
 ## Utilities
+工具函数
 ### torch.nn.utils.clip_grad_norm(parameters, max_norm, norm_type=2)[source]
 Clips gradient norm of an iterable of parameters.
 
-The norm is computed over all gradients together, as if they were concatenated into a single vector. Gradients are modified in-place.
+正则項的值由所有的梯度计算出来，就像他们连成一个向量一样。梯度被`in-place operation`修改。
 
-Parameters:
-parameters (Iterable[Variable]) – an iterable of Variables that will have gradients normalized
-max_norm (float or int) – max norm of the gradients
-norm_type (float or int) – type of the used p-norm. Can be 'inf' for infinity norm.
-Returns:
-Total norm of the parameters (viewed as a single vector).
+参数说明:
+- parameters (Iterable[Variable]) – 可迭代的`Variables`，它们的梯度即将被标准化。
+- max_norm (float or int) – `clip`后，`gradients` p-norm 值
+- norm_type (float or int) – 标准化的类型，p-norm. 可以是`inf` 代表 infinity norm.
+
+[关于norm](https://rorasa.wordpress.com/2012/05/13/l0-norm-l1-norm-l2-norm-l-infinity-norm/)
+
+返回值:
+
+所有参数的p-norm值。
 
 ### torch.nn.utils.rnn.PackedSequence(\_cls, data, batch_sizes)[source]
 Holds the data and list of batch_sizes of a packed sequence.
 
 All RNN modules accept packed sequences as inputs.
+所有的`RNN`模块都接收这种被包裹后的序列作为它们的输入。
 
-Note
+`NOTE：`
+这个类的实例不能手动创建。它们只能被 `pack_padded_sequence()` 实例化。
 
-Instances of this class should never be created manually. They are meant to be instantiated by functions like pack_padded_sequence().
+参数说明:
 
-Variables:
-data (Variable) – Variable containing packed sequence
-batch_sizes (list[int]) – list of integers holding information about the batch size at each sequence step
+- data (Variable) – 包含打包后序列的`Variable`。
+
+- batch_sizes (list[int]) – 包含 `mini-batch` 中每个序列长度的列表。
+
 #### torch.nn.utils.rnn.pack_padded_sequence(input, lengths, batch_first=False)[source]
 Packs a Variable containing padded sequences of variable length.
+把一个包含 填充过的变长序列 `Variable`打包。
 
-Input can be of size TxBx* where T is the length of the longest sequence (equal to lengths[0]), B is the batch size, and * is any number of dimensions (including 0). If batch_first is True BxTx* inputs are expected.
+输入的形状可以是(T×B×* )。`T`是最长序列长度，`B`是`batch size`，`*`代表任意维度(可以是0)。如果`batch_first=True`的话，那么相应的 `input size` 就是 `(B×T×*)`。
 
-The sequences should be sorted by length in a decreasing order, i.e. input[:,0] should be the longest sequence, and input[:,B-1] the shortest one.
+`Variable`中保存的序列，应该按序列长度的长短排序，长的在前，短的在后。即`input[:,0]`代表的是最长的序列，`input[:, B-1]`保存的是最短的序列。
 
-Note
+`NOTE：`
+只要是维度大于等于2的`input`都可以作为这个函数的参数。你可以用它来打包`labels`，然后用`RNN`的输出和打包后的`labels`来计算`loss`。通过`PackedSequence`对象的`.data`属性可以获取 `Variable`。
 
-This function accept any input that has at least two dimensions. You can apply it to pack the labels, and use the output of the RNN with them to compute the loss directly. A Variable can be retrieved from a PackedSequence object by accessing its .data attribute.
+参数说明:
 
-Parameters:
-input (Variable) – padded batch of variable length sequences.
-lengths (list[int]) – list of sequences lengths of each batch element.
-batch_first (bool, optional) – if True, the input is expected in BxTx* format.
-Returns:
-a PackedSequence object
+- input (Variable) – 变长序列 被填充后的 batch
+
+- lengths (list[int]) – `Variable` 中 每个序列的长度。
+
+- batch_first (bool, optional) – 如果是`True`，input的形状应该是`B*T*size`。
+
+返回值:
+
+一个`PackedSequence` 对象。
 
 ### torch.nn.utils.rnn.pad_packed_sequence(sequence, batch_first=False)[source]
+
 Pads a packed batch of variable length sequences.
 
 It is an inverse operation to pack_padded_sequence().
@@ -722,8 +737,12 @@ The returned Variable’s data will be of size TxBx*, where T is the length of t
 
 Batch elements will be ordered decreasingly by their length.
 
-Parameters:
-sequence (PackedSequence) – batch to pad
-batch_first (bool, optional) – if True, the output will be in BxTx* format.
-Returns:
+参数说明:
+
+- sequence (PackedSequence) – batch to pad
+
+- batch_first (bool, optional) – if True, the output will be in BxTx* format.
+
+返回值:
+
 Tuple of Variable containing the padded sequence, and a list of lengths of each sequence in the batch.
