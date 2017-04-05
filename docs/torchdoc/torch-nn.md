@@ -399,74 +399,112 @@ class MyModule(nn.Module):
 
 对输入序列中每个元素，`RNN`每层的计算公式为
 $$
-h_t=tanh(w_{ih}* xt+b_{ih}+w_{hh}* h_{t-1}+b_{hh})
+h_t=tanh(w_{ih}* x_t+b_{ih}+w_{hh}* h_{t-1}+b_{hh})
 $$
-where htht is the hidden state at time t, and xtxt is the hidden state of the previous layer at time t or inputtinputt for the first layer. If nonlinearity=’relu’, then ReLU is used instead of tanh.
+$h_t$是时刻$t$的隐状态。 $x_t$是上一层时刻$t$的隐状态，或者是第一层在时刻$t$的输入。如果`nonlinearity='relu'`,那么将使用`relu`代替`tanh`作为激活函数。
 
-Parameters:
-input_size – The number of expected features in the input x
-hidden_size – The number of features in the hidden state h
-num_layers – Number of recurrent layers.
-nonlinearity – The non-linearity to use [‘tanh’|’relu’]. Default: ‘tanh’
-bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
-batch_first – If True, then the input and output tensors are provided as (batch, seq, feature)
-dropout – If non-zero, introduces a dropout layer on the outputs of each RNN layer except the last layer
-bidirectional – If True, becomes a bidirectional RNN. Default: False
-Inputs: input, h_0
-input (seq_len, batch, input_size): tensor containing the features of the input sequence. The input can also be a packed variable length sequence. See torch.nn.utils.rnn.pack_padded_sequence() for details.
-h_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
-Outputs: output, h_n
-output (seq_len, batch, hidden_size * num_directions): tensor containing the output features (h_k) from the last layer of the RNN, for each k. If a torch.nn.utils.rnn.PackedSequence has been given as the input, the output will also be a packed sequence.
-h_n (num_layers * num_directions, batch, hidden_size): tensor containing the hidden state for k=seq_len.
-Variables:
-weight_ih_l[k] – the learnable input-hidden weights of the k-th layer, of shape (input_size x hidden_size)
-weight_hh_l[k] – the learnable hidden-hidden weights of the k-th layer, of shape (hidden_size x hidden_size)
-bias_ih_l[k] – the learnable input-hidden bias of the k-th layer, of shape (hidden_size)
-bias_hh_l[k] – the learnable hidden-hidden bias of the k-th layer, of shape (hidden_size)
-Examples:
+参数说明:
 
->>> rnn = nn.RNN(10, 20, 2)
->>> input = Variable(torch.randn(5, 3, 10))
->>> h0 = Variable(torch.randn(2, 3, 20))
->>> output, hn = rnn(input, h0)
-class torch.nn.LSTM(*args, **kwargs)[source]
-Applies a multi-layer long short-term memory (LSTM) RNN to an input sequence.
+- input_size – 输入`x`的特征数量。
 
-For each element in the input sequence, each layer computes the following function:
+- hidden_size – 隐层的特征数量。
 
-it=sigmoid(Wiixt+bii+Whih(t−1)+bhi)ft=sigmoid(Wifxt+bif+Whfh(t−1)+bhf)gt=tanh(Wigxt+big+Whch(t−1)+bhg)ot=sigmoid(Wioxt+bio+Whoh(t−1)+bho)ct=ft∗c(t−1)+it∗gtht=ot∗tanh(ct)
-it=sigmoid(Wiixt+bii+Whih(t−1)+bhi)ft=sigmoid(Wifxt+bif+Whfh(t−1)+bhf)gt=tanh⁡(Wigxt+big+Whch(t−1)+bhg)ot=sigmoid(Wioxt+bio+Whoh(t−1)+bho)ct=ft∗c(t−1)+it∗gtht=ot∗tanh⁡(ct)
-where htht is the hidden state at time t, ctct is the cell state at time t, xtxt is the hidden state of the previous layer at time t or inputtinputt for the first layer, and itit, ftft, gtgt, otot are the input, forget, cell, and out gates, respectively.
+- num_layers – RNN的层数。
 
-Parameters:
-input_size – The number of expected features in the input x
-hidden_size – The number of features in the hidden state h
-num_layers – Number of recurrent layers.
-bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
-batch_first – If True, then the input and output tensors are provided as (batch, seq, feature)
-dropout – If non-zero, introduces a dropout layer on the outputs of each RNN layer except the last layer
-bidirectional – If True, becomes a bidirectional RNN. Default: False
-Inputs: input, (h_0, c_0)
-input (seq_len, batch, input_size): tensor containing the features of the input sequence. The input can also be a packed variable length sequence. See torch.nn.utils.rnn.pack_padded_sequence() for details.
-h_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
-c_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial cell state for each element in the batch.
-Outputs: output, (h_n, c_n)
-output (seq_len, batch, hidden_size * num_directions): tensor containing the output features (h_t) from the last layer of the RNN, for each t. If a torch.nn.utils.rnn.PackedSequence has been given as the input, the output will also be a packed sequence.
-h_n (num_layers * num_directions, batch, hidden_size): tensor containing the hidden state for t=seq_len
-c_n (num_layers * num_directions, batch, hidden_size): tensor containing the cell state for t=seq_len
-Variables:
-weight_ih_l[k] – the learnable input-hidden weights of the k-th layer (W_ii|W_if|W_ig|W_io), of shape (input_size x 4*hidden_size)
-weight_hh_l[k] – the learnable hidden-hidden weights of the k-th layer (W_hi|W_hf|W_hg|W_ho), of shape (hidden_size x 4*hidden_size)
-bias_ih_l[k] – the learnable input-hidden bias of the k-th layer (b_ii|b_if|b_ig|b_io), of shape (4*hidden_size)
-bias_hh_l[k] – the learnable hidden-hidden bias of the k-th layer (W_hi|W_hf|W_hg|b_ho), of shape (4*hidden_size)
-Examples:
+- nonlinearity – 指定非线性函数使用`tanh`还是`relu`。默认是`tanh`。
 
->>> rnn = nn.LSTM(10, 20, 2)
->>> input = Variable(torch.randn(5, 3, 10))
->>> h0 = Variable(torch.randn(2, 3, 20))
->>> c0 = Variable(torch.randn(2, 3, 20))
->>> output, hn = rnn(input, (h0, c0))
-class torch.nn.GRU(*args, **kwargs)[source]
+- bias – 如果是`False`，那么RNN层就不会使用偏置权重 $b_ih$和$b_hh$,默认是`True`
+
+- batch_first – 如果`True`的话，那么输入`Tensor`的shape应该是[batch_size, time_step, feature],输出也是这样。
+- dropout – 如果值非零，那么除了最后一层外，其它层的输出都会套上一个`dropout`层。
+
+- bidirectional – 如果`True`，将会变成一个双向`RNN`，默认为`False`。
+
+
+`RNN`的输入：
+**(input, h_0)**
+- input (seq_len, batch, input_size): 保存输入序列特征的`tensor`。`input`可以是被填充的变长的序列。细节请看`torch.nn.utils.rnn.pack_padded_sequence()`
+
+- h_0 (num_layers * num_directions, batch, hidden_size): 保存着初始隐状态的`tensor`
+
+`RNN`的输出：
+**(output, h_n)**
+
+- output (seq_len, batch, hidden_size * num_directions): 保存着`RNN`最后一层的输出特征。如果输入是被填充过的序列，那么输出也是被填充的序列。
+- h_n (num_layers * num_directions, batch, hidden_size): 保存着最后一个时刻隐状态。
+
+`RNN`模型参数:
+
+- weight_ih_l[k] – 第`k`层的 `input-hidden` 权重， 可学习，形状是`(input_size x hidden_size)`。
+
+- weight_hh_l[k] – 第`k`层的 `hidden-hidden` 权重， 可学习，形状是`(hidden_size x hidden_size)`
+
+- bias_ih_l[k] – 第`k`层的 `input-hidden` 偏置， 可学习，形状是`(hidden_size)`
+
+- bias_hh_l[k] – 第`k`层的 `hidden-hidden` 偏置， 可学习，形状是`(hidden_size)`
+
+示例：
+```python
+rnn = nn.RNN(10, 20, 2)
+input = Variable(torch.randn(5, 3, 10))
+h0 = Variable(torch.randn(2, 3, 20))
+output, hn = rnn(input, h0)
+```
+### class torch.nn.LSTM(* args, ** kwargs)[source]
+
+将一个多层的 `(LSTM)` 应用到输入序列。
+
+对输入序列的每个元素，`LSTM`的每层都会执行以下计算：
+$$
+\begin{aligned}
+i_t &= sigmoid(W_{ii}x_t+b_{ii}+W_{hi}h_{t-1}+b_{hi}) \\
+f_t &= sigmoid(W_{if}x_t+b_{if}+W_{hf}h_{t-1}+b_{hf}) \\
+o_t &= sigmoid(W_{io}x_t+b_{io}+W_{ho}h_{t-1}+b_{ho})\\
+g_t &= tanh(W_{ig}x_t+b_{ig}+W_{hg}h_{t-1}+b_{hg})\\
+c_t &= f_t*c_{t-1}+i_t*g_t\\
+h_t &= o_t*tanh(c_t)
+\end{aligned}
+$$
+$h_t$是时刻$t$的隐状态,$c_t$是时刻$t$的细胞状态，$x_t$是上一层的在时刻$t$的隐状态或者是第一层在时刻$t$的输入。$i_t, f_t, g_t, o_t$ 分别代表 输入门，遗忘门，细胞和输出门。
+
+参数说明:
+
+- input_size – The number of expected features in the input x
+- hidden_size – The number of features in the hidden state h
+- num_layers – Number of recurrent layers.
+- bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
+- batch_first – If True, then the input and output tensors are provided as (batch, seq, feature)
+- dropout – If non-zero, introduces a dropout layer on the outputs of each RNN layer except the last layer
+- bidirectional – If True, becomes a bidirectional RNN. Default: False
+
+`LSTM`输入:
+input, (h_0, c_0)
+
+- input (seq_len, batch, input_size): tensor containing the features of the input sequence. The input can also be a packed variable length sequence. See torch.nn.utils.rnn.pack_padded_sequence() for details.
+- h_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
+- c_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial cell state for each element in the batch.
+
+`LSTM`输出
+output, (h_n, c_n)
+- output (seq_len, batch, hidden_size * num_directions): tensor containing the output features (h_t) from the last layer of the RNN, for each t. If a torch.nn.utils.rnn.PackedSequence has been given as the input, the output will also be a packed sequence.
+- h_n (num_layers * num_directions, batch, hidden_size): tensor containing the hidden state for t=seq_len
+- c_n (num_layers * num_directions, batch, hidden_size): tensor containing the cell state for t=seq_len
+
+`LSTM`模型参数:
+- weight_ih_l[k] – the learnable input-hidden weights of the k-th layer (W_ii|W_if|W_ig|W_io), of shape (input_size x 4*hidden_size)
+- weight_hh_l[k] – the learnable hidden-hidden weights of the k-th layer (W_hi|W_hf|W_hg|W_ho), of shape (hidden_size x 4*hidden_size)
+- bias_ih_l[k] – the learnable input-hidden bias of the k-th layer (b_ii|b_if|b_ig|b_io), of shape (4*hidden_size)
+- bias_hh_l[k] – the learnable hidden-hidden bias of the k-th layer (W_hi|W_hf|W_hg|b_ho), of shape (4*hidden_size)
+示例:
+```python
+lstm = nn.LSTM(10, 20, 2)
+input = Variable(torch.randn(5, 3, 10))
+h0 = Variable(torch.randn(2, 3, 20))
+c0 = Variable(torch.randn(2, 3, 20))
+output, hn = lstm(input, (h0, c0))
+```
+
+### class torch.nn.GRU(* args, ** kwargs)[source]
 Applies a multi-layer gated recurrent unit (GRU) RNN to an input sequence.
 
 For each element in the input sequence, each layer computes the following function:
@@ -495,12 +533,14 @@ weight_hh_l[k] – the learnable hidden-hidden weights of the k-th layer (W_hr|W
 bias_ih_l[k] – the learnable input-hidden bias of the k-th layer (b_ir|b_ii|b_in), of shape (3*hidden_size)
 bias_hh_l[k] – the learnable hidden-hidden bias of the k-th layer (W_hr|W_hi|W_hn), of shape (3*hidden_size)
 Examples:
-
+```python
 >>> rnn = nn.GRU(10, 20, 2)
 >>> input = Variable(torch.randn(5, 3, 10))
 >>> h0 = Variable(torch.randn(2, 3, 20))
 >>> output, hn = rnn(input, h0)
-class torch.nn.RNNCell(input_size, hidden_size, bias=True, nonlinearity='tanh')[source]
+```
+
+### class torch.nn.RNNCell(input_size, hidden_size, bias=True, nonlinearity='tanh')[source]
 An Elman RNN cell with tanh or ReLU non-linearity.
 
 h′=tanh(wih∗x+bih+whh∗h+bhh)
@@ -523,7 +563,7 @@ weight_hh – the learnable hidden-hidden weights, of shape (hidden_size x hidde
 bias_ih – the learnable input-hidden bias, of shape (hidden_size)
 bias_hh – the learnable hidden-hidden bias, of shape (hidden_size)
 Examples:
-
+```python
 >>> rnn = nn.RNNCell(10, 20)
 >>> input = Variable(torch.randn(6, 3, 10))
 >>> hx = Variable(torch.randn(3, 20))
@@ -531,7 +571,9 @@ Examples:
 >>> for i in range(6):
 ...     hx = rnn(input[i], hx)
 ...     output.append(hx)
-class torch.nn.LSTMCell(input_size, hidden_size, bias=True)[source]
+```
+
+### class torch.nn.LSTMCell(input_size, hidden_size, bias=True)[source]
 A long short-term memory (LSTM) cell.
 
 i=sigmoid(Wiix+bii+Whih+bhi)f=sigmoid(Wifx+bif+Whfh+bhf)g=tanh(Wigx+big+Whch+bhg)o=sigmoid(Wiox+bio+Whoh+bho)c′=f∗c+i∗gh′=o∗tanh(ct)
@@ -553,7 +595,7 @@ weight_hh – the learnable hidden-hidden weights, of shape (hidden_size x hidde
 bias_ih – the learnable input-hidden bias, of shape (hidden_size)
 bias_hh – the learnable hidden-hidden bias, of shape (hidden_size)
 Examples:
-
+```python
 >>> rnn = nn.LSTMCell(10, 20)
 >>> input = Variable(torch.randn(6, 3, 10))
 >>> hx = Variable(torch.randn(3, 20))
@@ -562,7 +604,9 @@ Examples:
 >>> for i in range(6):
 ...     hx, cx = rnn(input[i], (hx, cx))
 ...     output.append(hx)
-class torch.nn.GRUCell(input_size, hidden_size, bias=True)[source]
+```
+
+### class torch.nn.GRUCell(input_size, hidden_size, bias=True)[source]
 A gated recurrent unit (GRU) cell
 
 r=sigmoid(Wirx+bir+Whrh+bhr)i=sigmoid(Wiix+bii+Whih+bhi)n=tanh(Winx+bin+r∗(Whnh+bhn))h′=(1−i)∗n+i∗h
@@ -604,5 +648,80 @@ Examples:
 ## Vision layers
 
 ## Multi-GPU layers
+### class torch.nn.DataParallel(module, device_ids=None, output_device=None, dim=0)[source]
+Implements data parallelism at the module level.
 
+This container parallelizes the application of the given module by splitting the input across the specified devices by chunking in the batch dimension. In the forward pass, the module is replicated on each device, and each replica handles a portion of the input. During the backwards pass, gradients from each replica are summed into the original module.
+
+The batch size should be larger than the number of GPUs used. It should also be an integer multiple of the number of GPUs so that each chunk is the same size (so that each GPU processes the same number of samples).
+
+See also: Use nn.DataParallel instead of multiprocessing
+
+Arbitrary positional and keyword inputs are allowed to be passed into DataParallel EXCEPT Tensors. All variables will be scattered on dim specified (default 0). Primitive types will be broadcasted, but all other types will be a shallow copy and can be corrupted if written to in the model’s forward pass.
+
+Parameters:
+module – module to be parallelized
+device_ids – CUDA devices (default: all devices)
+output_device – device location of output (default: device_ids[0])
+Example:
+```python
+>>> net = torch.nn.DataParallel(model, device_ids=[0, 1, 2])
+>>> output = net(input_var)
+```
 ## Utilities
+### torch.nn.utils.clip_grad_norm(parameters, max_norm, norm_type=2)[source]
+Clips gradient norm of an iterable of parameters.
+
+The norm is computed over all gradients together, as if they were concatenated into a single vector. Gradients are modified in-place.
+
+Parameters:
+parameters (Iterable[Variable]) – an iterable of Variables that will have gradients normalized
+max_norm (float or int) – max norm of the gradients
+norm_type (float or int) – type of the used p-norm. Can be 'inf' for infinity norm.
+Returns:
+Total norm of the parameters (viewed as a single vector).
+
+### torch.nn.utils.rnn.PackedSequence(\_cls, data, batch_sizes)[source]
+Holds the data and list of batch_sizes of a packed sequence.
+
+All RNN modules accept packed sequences as inputs.
+
+Note
+
+Instances of this class should never be created manually. They are meant to be instantiated by functions like pack_padded_sequence().
+
+Variables:
+data (Variable) – Variable containing packed sequence
+batch_sizes (list[int]) – list of integers holding information about the batch size at each sequence step
+#### torch.nn.utils.rnn.pack_padded_sequence(input, lengths, batch_first=False)[source]
+Packs a Variable containing padded sequences of variable length.
+
+Input can be of size TxBx* where T is the length of the longest sequence (equal to lengths[0]), B is the batch size, and * is any number of dimensions (including 0). If batch_first is True BxTx* inputs are expected.
+
+The sequences should be sorted by length in a decreasing order, i.e. input[:,0] should be the longest sequence, and input[:,B-1] the shortest one.
+
+Note
+
+This function accept any input that has at least two dimensions. You can apply it to pack the labels, and use the output of the RNN with them to compute the loss directly. A Variable can be retrieved from a PackedSequence object by accessing its .data attribute.
+
+Parameters:
+input (Variable) – padded batch of variable length sequences.
+lengths (list[int]) – list of sequences lengths of each batch element.
+batch_first (bool, optional) – if True, the input is expected in BxTx* format.
+Returns:
+a PackedSequence object
+
+### torch.nn.utils.rnn.pad_packed_sequence(sequence, batch_first=False)[source]
+Pads a packed batch of variable length sequences.
+
+It is an inverse operation to pack_padded_sequence().
+
+The returned Variable’s data will be of size TxBx*, where T is the length of the longest sequence and B is the batch size. If batch_size is True, the data will be transposed into BxTx* format.
+
+Batch elements will be ordered decreasingly by their length.
+
+Parameters:
+sequence (PackedSequence) – batch to pad
+batch_first (bool, optional) – if True, the output will be in BxTx* format.
+Returns:
+Tuple of Variable containing the padded sequence, and a list of lengths of each sequence in the batch.
