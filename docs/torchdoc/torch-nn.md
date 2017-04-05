@@ -227,6 +227,8 @@ for param in model.parameters():
 
 `Buffers`可以通过注册时候的`name`获取。
 
+**`NOTE`:我们可以用 buffer 保存 `moving average`**
+
 例子：
 
 ```python
