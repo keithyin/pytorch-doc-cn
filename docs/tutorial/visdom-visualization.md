@@ -13,9 +13,8 @@
 * [基本概念](#基本概念)
 * [Setup](#setup)
 * [启动](#启动)
-* [Visualization API](#visualization-api)
-* [To Do](#to-do)
-* [Contributing](#contributing)
+* [可视化接口](#可视化接口)
+* [总结](#总结)
 
 
 ## 总览
@@ -115,7 +114,7 @@ python example/demo.py
 ```
 
 
-## Visualization API(可视化API)
+## 可视化接口
 `Visdom`支持下列`API`。由[Plotly](https://plot.ly/)提供可视化支持。
 
 - `vis.scatter`  : 2D 或 3D 散点图
@@ -124,7 +123,7 @@ python example/demo.py
 - `vis.heatmap`  : 热力图
 - `vis.bar`      : 条形图
 - `vis.histogram`: 直方图
-- `vis.boxplot`  : 箱图
+- `vis.boxplot`  : 箱型图
 - `vis.surf`     : 表面图
 - `vis.contour`  : 轮廓图
 - `vis.quiver`   : 绘出二维矢量场
@@ -173,7 +172,7 @@ The following `options` are supported:
 #### plot.stem
 这个函数用来画茎叶图。它需要一个 形状为`N`或者`N*M`的 tensor `X` 来指定`M`时间序列中`N`个点的值。一个可选择的`Y`，形状为`N`或者`N×M`，用`Y`来指定时间戳，如果`Y`的形状是`N`，那么默认`M`时间序列共享同一个时间戳。
 
-支持以下选项：
+支持以下特定选项：
 
 - `options.colormap`: colormap (`string`; default = `'Viridis'`)
 - `options.legend`  : `table` containing legend names
@@ -181,7 +180,7 @@ The following `options` are supported:
 #### plot.heatmap
 这个函数用来画热力图。它输入一个 形状为`N×M`的 tensor `X`。`X`指定了热力图中位置的值。
 
-支持下列选项：
+支持下列特定选项：
 
 - `options.colormap`   : 色图 (`string`; default = `'Viridis'`)
 - `options.xmin`       : 小于这个值的会被剪切成这个值(`number`; default = `X:min()`)
@@ -198,7 +197,7 @@ The following `options` are supported:
 - X(tensor):形状 `N` 或 `N×M`，指定每个条的高度。如果`X`有`M`列，那么每行的值可以看作一组或者把他们值堆起来（取决与`options.stacked`是否为True）。
 - Y(tensor, optional):形状 `N`，指定对应的x轴的值。
 
-支持以下选项：
+支持以下特定选项：
 
 - `options.columnnames`: `table` containing x-axis labels
 - `options.stacked`    : stack multiple columns in `X`
@@ -209,7 +208,7 @@ The following `options` are supported:
 
 这个函数用来画指定数据的直方图。他需要输入长度为 `N` 的 tensor `X`。`X`保存了构建直方图的值。
 
-支持下面选项：
+支持下面特定选项：
 
 - `options.numbins`: `bins`的个数 (`number`; default = 30)
 
@@ -222,7 +221,7 @@ The following `options` are supported:
 
 - X(tensor): 形状 `N`或`N×M`，指定做第`m`个箱型图的`N`个值。
 
-支持以下选项：
+支持以下特定选项：
 
 - `options.legend`: labels for each of the columns in `X`
 
@@ -232,7 +231,7 @@ The following `options` are supported:
 
 - X(tensor):形状 `N×M`，指定表面图上位置的值.
 
-支持以下选项：
+支持以下特定选项：
 
 - `options.colormap`: colormap (`string`; default = `'Viridis'`)
 - `options.xmin`    : clip minimum value (`number`; default = `X:min()`)
@@ -245,65 +244,73 @@ The following `options` are supported:
 
 - X(tensor)：形状 `N×M`，指定了轮廓图中的值
 
-支持以下选项：
+支持以下特定选项：
 
 - `options.colormap`: colormap (`string`; default = `'Viridis'`)
 - `options.xmin`    : clip minimum value (`number`; default = `X:min()`)
 - `options.xmax`    : clip maximum value (`number`; default = `X:max()`)
 
 #### plot.quiver
-This function draws a quiver plot in which the direction and length of the
-arrows is determined by the `NxM` tensors `X` and `Y`. Two optional `NxM`
-tensors `gridX` and `gridY` can be provided that specify the offsets of
-the arrows; by default, the arrows will be done on a regular grid.
+这个函数用来画二维矢量场图。
 
-The following `options` are supported:
+输入：
 
-- `options.normalize`:  length of longest arrows (`number`)
-- `options.arrowheads`: show arrow heads (`boolean`; default = `true`)
+- X(tensor): 形状 `N*M`
+- Y(tensor):形状 `N*M`
+- gridX(tensor, optional):形状 `N*M`
+- gradY(tensor, optional): 形状 `N*M`
+`X` 与 `Y`决定了 箭头的长度和方向。可选的`gridX`和`gridY`指定了偏移。
+
+支持下列特定选项：
+
+- `options.normalize`:  最长肩头的长度 (`number`)
+- `options.arrowheads`: 是否现实箭头 (`boolean`; default = `true`)
 
 #### plot.image
-This function draws an `img`. It takes as input an `CxHxW` tensor `img`
-that contains the image.
+这个函数用来画 图片。
+输入：
 
-The following `options` are supported:
+- img(tensor): shape(`C*H*W`)。
+
+支持下面特定选项:
 
 - `options.jpgquality`: JPG quality (`number` 0-100; default = 100)
 
 ### plot.video
-This function plays a video. It takes as input the filename of the video
-`videofile` or a `LxCxHxW`-sized `tensor` (in Lua) or a or a `LxHxWxC`-sized
-`tensor` (in Python) containing all the frames of the video as input. The
-function does not support any plot-specific `options`.
+这个函数 播放一个 `video`。
+输入： `video` 的文件名，或者是一个 shape 为`L*H*W*C` 的 `tensor`。这个函数不支持其它特定的功能选项。
 
-Note: Using `tensor` input requires that ffmpeg is installed and working.
-Your ability to play video may depend on the browser you use: your browser has
-to support the Theano codec in an OGG container (Chrome supports this).
+注意:使用`tensor`作为输入的时候，需要安装`ffmpeg`。
+能不能播放`video`取决你使用的浏览器：浏览器必须要支持`Theano codec in an OGG container`。（chrome可以用）。
 
 ### plot.svg
-This function draws an SVG object. It takes as input a SVG string `svgstr` or
-the name of an SVG file `svgfile`. The function does not support any specific
-`options`.
+
+此函数绘制一个`SVG`对象。输入是一个`SVG`字符串或 一个`SVG`文件的名称。该功能不支持任何特定的功能
+`options`。
 
 #### plot.text
-This function prints text in a  box. It takes as input a `text` string.
-No specific `options` are currently supported.
+此函数可在文本框中打印文本。输入输入一个`text`字符串。目前不支持特定的`options`
 
 ### plot.mesh
-This function draws a mesh plot from a set of vertices defined in an
-`Nx2` or `Nx3` matrix `X`, and polygons defined in an optional `Mx2` or
-`Mx3` matrix `Y`.
+此函数画出一个网格图。
 
-The following `options` are supported:
+输入：
+
+- X(tensor): shape(`N*2`或`N*3`) 定义`N`个顶点
+
+- Y(tensor， optional)：shape(`M*2`或`M×3`) 定义多边形
+
+
+支持下列特定选项:
 
 - `options.color`: color (`string`)
-- `options.opacity`: opacity of polygons (`number` between 0 and 1)
+- `options.opacity`: 多边形的不透明性 (`number` between 0 and 1)
 
 ### Customizing plots
 
-The plotting functions take an optional `options` table as input that can be used to change (generic or plot-specific) properties of the plots. All input arguments are specified in a single table; the input arguments are matches based on the keys they have in the input table.
+绘图函数使用可选的`options`表作为输入。用它来修改默认的绘图属性。所有输入参数在单个表中指定;输入参数是基于输入表中键的匹配。
 
-The following `options` are generic in the sense that they are the same for all visualizations (except `plot.image` and `plot.text`):
+下列的选项除了对于`plot.img`和`plot.txt`不可用以外，其他的绘图函数都适用。我们称他为 通用选项。
 
 - `options.title`       : figure title
 - `options.width`       : figure width
@@ -327,5 +334,12 @@ The following `options` are generic in the sense that they are the same for all 
 - `options.marginbottom`: bottom margin (in pixels)
 
 
-The other options are visualization-specific, and are described in the
-documentation of the functions.
+其它的一些选项就是函数特定的选项，在上面API介绍的时候已经提到过。
+
+## 总结
+明确几个名词：
+
+- env：看作一个大容器
+- pane： 就是用于绘图的小窗口，在代码中叫 `window`
+
+使用`Visdom`就是在`env`中的`pane`上画图。
