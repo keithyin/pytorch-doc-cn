@@ -12,7 +12,7 @@ pages:
 
 theme: readthedocs
 python:
-   version: 2 # for unicode
+   version: 3
    setup_py_install: true
 
 #the third-party extenison mdx_math.py comes with a setup.py script
