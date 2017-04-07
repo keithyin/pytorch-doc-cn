@@ -46,61 +46,63 @@ ImageNet 1-crop error rates (224x224)
 |Densenet-201|	22.80|	6.43|
 |Densenet-161|	22.35	|6.20|
 
-## torchvision.models.alexnet(pretrained=False, ** kwargs)
+## 模型
+
+### torchvision.models.alexnet(pretrained=False, ** kwargs)
 `AlexNet` 模型结构 [paper地址](https://arxiv.org/abs/1404.5997)
 
 - pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
 
-## torchvision.models.resnet18(pretrained=False, ** kwargs)
+### torchvision.models.resnet18(pretrained=False, ** kwargs)
 构建一个`resnet18`模型
 
 - pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
 
-## torchvision.models.resnet34(pretrained=False, ** kwargs)
+### torchvision.models.resnet34(pretrained=False, ** kwargs)
 构建一个`ResNet-34` 模型.
 
 Parameters:	pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
 
-## torchvision.models.resnet50(pretrained=False, ** kwargs)
+### torchvision.models.resnet50(pretrained=False, ** kwargs)
 构建一个`ResNet-50`模型
 
 - pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
 
-## torchvision.models.resnet101(pretrained=False, ** kwargs)
+### torchvision.models.resnet101(pretrained=False, ** kwargs)
 Constructs a ResNet-101 model.
 
 - pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
 
-## torchvision.models.resnet152(pretrained=False, ** kwargs)
+### torchvision.models.resnet152(pretrained=False, ** kwargs)
 Constructs a ResNet-152 model.
 
 - pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
 
-## torchvision.models.vgg11(pretrained=False, ** kwargs)
+### torchvision.models.vgg11(pretrained=False, ** kwargs)
 VGG 11-layer model (configuration “A”)
 - pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
 
-## torchvision.models.vgg11_bn(** kwargs)
+### torchvision.models.vgg11_bn(** kwargs)
 VGG 11-layer model (configuration “A”) with batch normalization
 
-## torchvision.models.vgg13(pretrained=False, ** kwargs)
+### torchvision.models.vgg13(pretrained=False, ** kwargs)
 VGG 13-layer model (configuration “B”)
 
 - pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
 
-## torchvision.models.vgg13_bn(** kwargs)
+### torchvision.models.vgg13_bn(** kwargs)
 VGG 13-layer model (configuration “B”) with batch normalization
 
-## torchvision.models.vgg16(pretrained=False, ** kwargs)
+### torchvision.models.vgg16(pretrained=False, ** kwargs)
 VGG 16-layer model (configuration “D”)
 
 Parameters:	pretrained (bool) – If True, returns a model pre-trained on ImageNet
-## torchvision.models.vgg16_bn(** kwargs)
+### torchvision.models.vgg16_bn(** kwargs)
 VGG 16-layer model (configuration “D”) with batch normalization
 
-## torchvision.models.vgg19(pretrained=False, ** kwargs)
+### torchvision.models.vgg19(pretrained=False, ** kwargs)
 VGG 19-layer model (configuration “E”)
 
 - pretrained (bool) – `True`, 返回在ImageNet上训练好的模型。
-## torchvision.models.vgg19_bn(** kwargs)
+### torchvision.models.vgg19_bn(** kwargs)
 VGG 19-layer model (configuration ‘E’) with batch normalization
