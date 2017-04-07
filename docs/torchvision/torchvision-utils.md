@@ -1,8 +1,7 @@
 # torchvision.utils
 
-```python
-torchvision.utils.make_grid(tensor, nrow=8, padding=2, normalize=False, range=None, scale_each=False)
-```
+
+### torchvision.utils.make_grid(tensor, nrow=8, padding=2, normalize=False, range=None, scale_each=False)
 
 猜测，用来做 `雪碧图的`（`sprite image`）。
 
@@ -45,6 +44,6 @@ plt.show()
 
 
 
->torchvision.utils.save_image(tensor, filename, nrow=8, padding=2, normalize=False, range=None, scale_each=False)
+### torchvision.utils.save_image(tensor, filename, nrow=8, padding=2, normalize=False, range=None, scale_each=False)
 
 将给定的`Tensor`保存成image文件。如果给定的是`mini-batch tensor`，那就用`make-grid`做成雪碧图，再保存。
