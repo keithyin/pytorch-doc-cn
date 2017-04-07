@@ -11,6 +11,7 @@ pages:
         - torchvision-util: torchvision/torchvision-utils.md
 
 theme: readthedocs
+
 python:
    version: 2
    setup_py_install: true
