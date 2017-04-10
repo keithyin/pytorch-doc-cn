@@ -1,4 +1,4 @@
-#torch.nn
+# torch.nn
 
 ## Parameters
 ### class torch.nn.Parameter()
@@ -536,10 +536,10 @@ bias_ih_l[k] – the learnable input-hidden bias of the k-th layer (b_ir|b_ii|b_
 bias_hh_l[k] – the learnable hidden-hidden bias of the k-th layer (W_hr|W_hi|W_hn), of shape (3*hidden_size)
 Examples:
 ```python
->>> rnn = nn.GRU(10, 20, 2)
->>> input = Variable(torch.randn(5, 3, 10))
->>> h0 = Variable(torch.randn(2, 3, 20))
->>> output, hn = rnn(input, h0)
+ rnn = nn.GRU(10, 20, 2)
+ input = Variable(torch.randn(5, 3, 10))
+ h0 = Variable(torch.randn(2, 3, 20))
+ output, hn = rnn(input, h0)
 ```
 
 ### class torch.nn.RNNCell(input_size, hidden_size, bias=True, nonlinearity='tanh')[source]
@@ -566,11 +566,11 @@ bias_ih – the learnable input-hidden bias, of shape (hidden_size)
 bias_hh – the learnable hidden-hidden bias, of shape (hidden_size)
 Examples:
 ```python
->>> rnn = nn.RNNCell(10, 20)
->>> input = Variable(torch.randn(6, 3, 10))
->>> hx = Variable(torch.randn(3, 20))
->>> output = []
->>> for i in range(6):
+ rnn = nn.RNNCell(10, 20)
+ input = Variable(torch.randn(6, 3, 10))
+ hx = Variable(torch.randn(3, 20))
+ output = []
+ for i in range(6):
 ...     hx = rnn(input[i], hx)
 ...     output.append(hx)
 ```
@@ -598,12 +598,12 @@ bias_ih – the learnable input-hidden bias, of shape (hidden_size)
 bias_hh – the learnable hidden-hidden bias, of shape (hidden_size)
 Examples:
 ```python
->>> rnn = nn.LSTMCell(10, 20)
->>> input = Variable(torch.randn(6, 3, 10))
->>> hx = Variable(torch.randn(3, 20))
->>> cx = Variable(torch.randn(3, 20))
->>> output = []
->>> for i in range(6):
+ rnn = nn.LSTMCell(10, 20)
+ input = Variable(torch.randn(6, 3, 10))
+ hx = Variable(torch.randn(3, 20))
+ cx = Variable(torch.randn(3, 20))
+ output = []
+ for i in range(6):
 ...     hx, cx = rnn(input[i], (hx, cx))
 ...     output.append(hx)
 ```
@@ -629,11 +629,11 @@ bias_ih – the learnable input-hidden bias, of shape (hidden_size)
 bias_hh – the learnable hidden-hidden bias, of shape (hidden_size)
 Examples:
 
->>> rnn = nn.GRUCell(10, 20)
->>> input = Variable(torch.randn(6, 3, 10))
->>> hx = Variable(torch.randn(3, 20))
->>> output = []
->>> for i in range(6):
+ rnn = nn.GRUCell(10, 20)
+ input = Variable(torch.randn(6, 3, 10))
+ hx = Variable(torch.randn(3, 20))
+ output = []
+ for i in range(6):
 ...     hx = rnn(input[i], hx)
 ...     output.append(hx)
 ## Linear layers
@@ -645,7 +645,245 @@ Examples:
 ## Distance functions
 
 ## Loss functions
+基本用法：
+```python
+criterion = LossCriterion() #构造函数有自己的参数
+loss = criterion(x, y) #调用标准时也有参数
+```
+计算出来的结果已经对`mini-batch`取了平均。
+### class torch.nn.L1Loss(size_average=True)[source]
+创建一个衡量输入`x`(`模型预测输出`)和目标`y`之间差的绝对值的平均值的标准。
+$$
+loss(x,y)=1/n\sum|x_i-y_i|
+$$
 
+- `x` 和 `y` 可以是任意形状，每个包含`n`个元素。
+
+- 对`n`个元素对应的差值的绝对值求和，得出来的结果除以`n`。
+
+- 如果在创建`L1Loss`实例的时候在构造函数中传入`size_average=False`，那么求出来的绝对值的和将不会除以`n`
+
+
+### class torch.nn.MSELoss(size_average=True)[source]
+创建一个衡量输入`x`(`模型预测输出`)和目标`y`之间均方误差标准。
+$$
+loss(x,y)=1/n\sum(x_i-y_i)^2
+$$
+
+- `x` 和 `y` 可以是任意形状，每个包含`n`个元素。
+
+- 对`n`个元素对应的差值的绝对值求和，得出来的结果除以`n`。
+
+- 如果在创建`MSELoss`实例的时候在构造函数中传入`size_average=False`，那么求出来的平方和将不会除以`n`
+
+### class torch.nn.CrossEntropyLoss(weight=None, size_average=True)[source]
+此标准将`LogSoftMax`和`NLLLoss`集成到一个类中。
+
+当训练一个多类分类器的时候，这个方法是十分有用的。
+
+- weight(tensor): `1-D` tensor，`n`个元素，分别代表`n`类的权重，如果你的训练样本很不均衡的话，是非常有用的。默认值为None。
+
+调用时参数：
+
+- input : 包含每个类的得分，`2-D` tensor,`shape`为 `batch*n`
+
+- target: 大小为 `n` 的 `1—D` `tensor`，包含类别的索引(`0到 n-1`)。
+
+
+Loss可以表述为以下形式：
+$$
+\begin{aligned}
+loss(x, class) &= -\text{log}\frac{exp(x[class])}{\sum_j exp(x[j]))}\\
+               &= -x[class] + log(\sum_j exp(x[j]))
+\end{aligned}
+$$
+当`weight`参数被指定的时候，`loss`的计算公式变为：
+$$
+loss(x, class) = weights[class] * (-x[class] + log(\sum_j exp(x[j])))
+$$
+计算出的`loss`对`mini-batch`的大小取了平均。
+
+形状(`shape`)：
+
+- Input: (N,C) `C` 是类别的数量
+
+- Target: (N) `N`是`mini-batch`的大小，0 <= targets[i] <= C-1
+
+### class torch.nn.NLLLoss(weight=None, size_average=True)[source]
+负的`log likelihood loss`损失。用于训练一个`n`类分类器。
+
+如果提供的话，`weight`参数应该是一个`1-D`tensor，里面的值对应类别的权重。当你的训练集样本不均衡的话，使用这个参数是非常有用的。
+
+输入是一个包含类别`log-probabilities`的`2-D` tensor，形状是`（mini-batch， n）`
+
+可以通过在最后一层加`LogSoftmax`来获得类别的`log-probabilities`。
+
+如果您不想增加一个额外层的话，您可以使用`CrossEntropyLoss`。
+
+此`loss`期望的`target`是类别的索引 (0 to N-1, where N = number of classes)
+
+此`loss`可以被表示如下：
+$$
+loss(x, class) = -x[class]
+$$
+如果`weights`参数被指定的话，`loss`可以表示如下：
+$$
+loss(x, class) = -weights[class] * x[class]
+$$
+参数说明：
+
+- weight (Tensor, optional) – 手动指定每个类别的权重。如果给定的话，必须是长度为`nclasses`
+
+- size_average (bool, optional) – 默认情况下，会计算`mini-batch``loss`的平均值。然而，如果`size_average=False`那么将会把`mini-batch`中所有样本的`loss`累加起来。
+
+形状:
+
+- Input: (N,C) , `C`是类别的个数
+
+- Target: (N) ， `target`中每个值的大小满足 `0 <= targets[i] <= C-1`
+
+例子:
+```python
+ m = nn.LogSoftmax()
+ loss = nn.NLLLoss()
+ # input is of size nBatch x nClasses = 3 x 5
+ input = autograd.Variable(torch.randn(3, 5), requires_grad=True)
+ # each element in target has to have 0 <= value < nclasses
+ target = autograd.Variable(torch.LongTensor([1, 0, 4]))
+ output = loss(m(input), target)
+ output.backward()
+```
+
+### class torch.nn.NLLLoss2d(weight=None, size_average=True)[source]
+This is negative log likehood loss, but for image inputs. It computes NLL loss per-pixel.
+
+Parameters:
+weight (Tensor, optional) – a manual rescaling weight given to each class. If given, has to be a 1D Tensor having as many elements, as there are classes.
+size_average – By default, the losses are averaged over observations for each minibatch. However, if the field size_average is set to False, the losses are instead summed for each minibatch. Default: True
+Shape:
+Input: (N,C,H,W)(N,C,H,W) where C = number of classes
+Target: (N,H,W)(N,H,W) where each value is 0 <= targets[i] <= C-1
+Examples
+```python
+ m = nn.Conv2d(16, 32, (3, 3)).float()
+ loss = nn.NLLLoss2d()
+ # input is of size nBatch x nClasses x height x width
+ input = autograd.Variable(torch.randn(3, 16, 10, 10))
+ # each element in target has to have 0 <= value < nclasses
+ target = autograd.Variable(torch.LongTensor(3, 8, 8).random_(0, 4))
+ output = loss(m(input), target)
+ output.backward()
+```
+### class torch.nn.KLDivLoss(weight=None, size_average=True)[source]
+The Kullback-Leibler divergence Loss
+
+KL divergence is a useful distance measure for continuous distributions and is often useful when performing direct regression over the space of (discretely sampled) continuous output distributions.
+
+As with NLLLoss, the input given is expected to contain log-probabilities, however unlike ClassNLLLoss, input is not restricted to a 2D Tensor, because the criterion is applied element-wise.
+
+This criterion expects a target Tensor of the same size as the input Tensor.
+
+The loss can be described as:
+
+loss(x,target)=1/n∑(targeti∗(log(targeti)−xi))
+loss(x,target)=1/n∑(targeti∗(log(targeti)−xi))
+By default, the losses are averaged for each minibatch over observations as well as over dimensions. However, if the field size_average is set to False, the losses are instead summed.
+
+### class torch.nn.BCELoss(weight=None, size_average=True)[source]
+Creates a criterion that measures the Binary Cross Entropy between the target and the output:
+
+loss(o,t)=−1/n∑i(t[i]∗log(o[i])+(1−t[i])∗log(1−o[i]))
+loss(o,t)=−1/n∑i(t[i]∗log(o[i])+(1−t[i])∗log(1−o[i]))
+or in the case of the weights argument being specified:
+
+loss(o,t)=−1/n∑iweights[i]∗(t[i]∗log(o[i])+(1−t[i])∗log(1−o[i]))
+loss(o,t)=−1/n∑iweights[i]∗(t[i]∗log(o[i])+(1−t[i])∗log(1−o[i]))
+This is used for measuring the error of a reconstruction in for example an auto-encoder. Note that the targets t[i] should be numbers between 0 and 1.
+
+By default, the losses are averaged for each minibatch over observations as well as over dimensions. However, if the field size_average is set to False, the losses are instead summed.
+
+### class torch.nn.MarginRankingLoss(margin=0, size_average=True)[source]
+Creates a criterion that measures the loss given inputs x1, x2, two 1D min-batch Tensor`s, and a label 1D mini-batch tensor `y with values (1 or -1).
+
+If y == 1 then it assumed the first input should be ranked higher (have a larger value) than the second input, and vice-versa for y == -1.
+
+The loss function for each sample in the mini-batch is:
+
+loss(x, y) = max(0, -y * (x1 - x2) + margin)
+if the internal variable size_average = True, the loss function averages the loss over the batch samples; if size_average = False, then the loss function sums over the batch samples. By default, size_average equals to True.
+
+### class torch.nn.HingeEmbeddingLoss(size_average=True)[source]
+Measures the loss given an input x which is a 2D mini-batch tensor and a labels y, a 1D tensor containg values (1 or -1). This is usually used for measuring whether two inputs are similar or dissimilar, e.g. using the L1 pairwise distance, and is typically used for learning nonlinear embeddings or semi-supervised learning:
+
+                 { x_i,                  if y_i ==  1
+loss(x, y) = 1/n {
+                 { max(0, margin - x_i), if y_i == -1
+x and y arbitrary shapes with a total of n elements each the sum operation still operates over all the elements, and divides by n.
+
+The division by n can be avoided if one sets the internal variable size_average=False.
+
+The margin has a default value of 1, or can be set in the constructor.
+
+### class torch.nn.MultiLabelMarginLoss(size_average=True)[source]
+Creates a criterion that optimizes a multi-class multi-classification hinge loss (margin-based loss) between input x (a 2D mini-batch Tensor) and output y (which is a 2D Tensor of target class indices). For each sample in the mini-batch:
+
+loss(x, y) = sum_ij(max(0, 1 - (x[y[j]] - x[i]))) / x.size(0)
+where i == 0 to x.size(0), j == 0 to y.size(0), y[j] != 0, and i != y[j] for all i and j.
+
+y and x must have the same size.
+
+The criterion only considers the first non zero y[j] targets.
+
+This allows for different samples to have variable amounts of target classes
+
+### class torch.nn.SmoothL1Loss(size_average=True)[source]
+Creates a criterion that uses a squared term if the absolute element-wise error falls below 1 and an L1 term otherwise. It is less sensitive to outliers than the MSELoss and in some cases prevents exploding gradients (e.g. see “Fast R-CNN” paper by Ross Girshick). Also known as the Huber loss:
+
+                      { 0.5 * (x_i - y_i)^2, if |x_i - y_i| < 1
+loss(x, y) = 1/n \sum {
+                      { |x_i - y_i| - 0.5,   otherwise
+x and y arbitrary shapes with a total of n elements each the sum operation still operates over all the elements, and divides by n.
+
+The division by n can be avoided if one sets the internal variable size_average to False
+
+### class torch.nn.SoftMarginLoss(size_average=True)[source]
+Creates a criterion that optimizes a two-class classification logistic loss between input x (a 2D mini-batch Tensor) and target y (which is a tensor containing either 1 or -1).
+
+loss(x, y) = sum_i (log(1 + exp(-y[i]*x[i]))) / x.nelement()
+The normalization by the number of elements in the input can be disabled by setting self.size_average to False.
+
+class torch.nn.MultiLabelSoftMarginLoss(weight=None, size_average=True)[source]
+Creates a criterion that optimizes a multi-label one-versus-all loss based on max-entropy, between input x (a 2D mini-batch Tensor) and target y (a binary 2D Tensor). For each sample in the minibatch:
+
+loss(x, y) = - sum_i (y[i] log( exp(x[i]) / (1 + exp(x[i])))
+                      + (1-y[i]) log(1/(1+exp(x[i])))) / x:nElement()
+where i == 0 to x.nElement()-1, y[i] in {0,1}. y and x must have the same size.
+
+### class torch.nn.CosineEmbeddingLoss(margin=0, size_average=True)[source]
+Creates a criterion that measures the loss given an input tensors x1, x2 and a Tensor label y with values 1 or -1. This is used for measuring whether two inputs are similar or dissimilar, using the cosine distance, and is typically used for learning nonlinear embeddings or semi-supervised learning.
+
+margin should be a number from -1 to 1, 0 to 0.5 is suggested. If margin is missing, the default value is 0.
+
+The loss function for each sample is:
+
+             { 1 - cos(x1, x2),              if y ==  1
+loss(x, y) = {
+             { max(0, cos(x1, x2) - margin), if y == -1
+If the internal variable size_average is equal to True, the loss function averages the loss over the batch samples; if size_average is False, then the loss function sums over the batch samples. By default, size_average = True.
+
+class torch.nn.MultiMarginLoss(p=1, margin=1, weight=None, size_average=True)[source]
+Creates a criterion that optimizes a multi-class classification hinge loss (margin-based loss) between input x (a 2D mini-batch Tensor) and output y (which is a 1D tensor of target class indices, 0 <= y <= x.size(1)):
+
+For each mini-batch sample:
+
+loss(x, y) = sum_i(max(0, (margin - x[y] + x[i]))^p) / x.size(0)
+             where `i == 0` to `x.size(0)` and `i != y`.
+Optionally, you can give non-equal weighting on the classes by passing a 1D weights tensor into the constructor.
+
+The loss function then becomes:
+
+loss(x, y) = sum_i(max(0, w[y] * (margin - x[y] - x[i]))^p) / x.size(0)
+By default, the losses are averaged over observations for each minibatch. However, if the field size_average is set to False, the losses are instead summed.
 
 ## Vision layers
 
@@ -668,8 +906,8 @@ device_ids – CUDA devices (default: all devices)
 output_device – device location of output (default: device_ids[0])
 Example:
 ```python
->>> net = torch.nn.DataParallel(model, device_ids=[0, 1, 2])
->>> output = net(input_var)
+ net = torch.nn.DataParallel(model, device_ids=[0, 1, 2])
+ output = net(input_var)
 ```
 ## Utilities
 工具函数
