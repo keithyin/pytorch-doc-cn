@@ -755,15 +755,22 @@ $$
 ```
 
 ### class torch.nn.NLLLoss2d(weight=None, size_average=True)[source]
-This is negative log likehood loss, but for image inputs. It computes NLL loss per-pixel.
 
-Parameters:
-weight (Tensor, optional) – a manual rescaling weight given to each class. If given, has to be a 1D Tensor having as many elements, as there are classes.
-size_average – By default, the losses are averaged over observations for each minibatch. However, if the field size_average is set to False, the losses are instead summed for each minibatch. Default: True
-Shape:
-Input: (N,C,H,W)(N,C,H,W) where C = number of classes
-Target: (N,H,W)(N,H,W) where each value is 0 <= targets[i] <= C-1
-Examples
+对于图片的 `negative log likehood loss`。计算每个像素的 `NLL loss`。
+
+参数说明：
+
+- weight (Tensor, optional) – 用来作为每类的权重，如果提供的话，必须为`1-D`tensor，大小为`C`：类别的个数。
+
+- size_average – 默认情况下，会计算 `mini-batch` loss均值。如果设置为 `False` 的话，将会累加`mini-batch`中所有样本的`loss`值。默认值：`True`。
+
+形状：
+
+- Input: (N,C,H,W)  `C` 类的数量
+
+- Target: (N,H,W) where each value is 0 <= targets[i] <= C-1
+
+例子：
 ```python
  m = nn.Conv2d(16, 32, (3, 3)).float()
  loss = nn.NLLLoss2d()
@@ -775,32 +782,35 @@ Examples
  output.backward()
 ```
 ### class torch.nn.KLDivLoss(weight=None, size_average=True)[source]
-The Kullback-Leibler divergence Loss
 
-KL divergence is a useful distance measure for continuous distributions and is often useful when performing direct regression over the space of (discretely sampled) continuous output distributions.
+计算 KL 散度损失。
 
-As with NLLLoss, the input given is expected to contain log-probabilities, however unlike ClassNLLLoss, input is not restricted to a 2D Tensor, because the criterion is applied element-wise.
+KL散度常用来描述两个分布的距离，并在输出分布的空间上执行直接回归是有用的。
 
-This criterion expects a target Tensor of the same size as the input Tensor.
+与`NLLLoss`一样，给定的输入应该是`log-probabilities`。然而。和`NLLLoss`不同的是，`input`不限于`2-D` tensor，因为此标准是基于`element`的。
 
-The loss can be described as:
+`target` 应该和 `input`的形状相同。
 
-loss(x,target)=1/n∑(targeti∗(log(targeti)−xi))
-loss(x,target)=1/n∑(targeti∗(log(targeti)−xi))
-By default, the losses are averaged for each minibatch over observations as well as over dimensions. However, if the field size_average is set to False, the losses are instead summed.
+此loss可以表示为：
+$$
+loss(x,target)=\frac{1}{n}\sum_i(target_i*(log(target_i)-x_i))
+$$
+默认情况下，loss会基于`element`求平均。如果 `size_average=False` `loss` 会被累加起来。
 
 ### class torch.nn.BCELoss(weight=None, size_average=True)[source]
-Creates a criterion that measures the Binary Cross Entropy between the target and the output:
 
-loss(o,t)=−1/n∑i(t[i]∗log(o[i])+(1−t[i])∗log(1−o[i]))
-loss(o,t)=−1/n∑i(t[i]∗log(o[i])+(1−t[i])∗log(1−o[i]))
-or in the case of the weights argument being specified:
+计算 `target` 与 `output` 之间的二进制交叉熵。
+$$
+loss(o,t)=-\frac{1}{n}\sum_i(t[i]* log(o[i])+(1-t[i])* log(1-o[i]))
+$$
+如果`weight`被指定 ：
+$$
+loss(o,t)=-\frac{1}{n}\sum_iweights[i]* (t[i]* log(o[i])+(1-t[i])* log(1-o[i]))
+$$
 
-loss(o,t)=−1/n∑iweights[i]∗(t[i]∗log(o[i])+(1−t[i])∗log(1−o[i]))
-loss(o,t)=−1/n∑iweights[i]∗(t[i]∗log(o[i])+(1−t[i])∗log(1−o[i]))
-This is used for measuring the error of a reconstruction in for example an auto-encoder. Note that the targets t[i] should be numbers between 0 and 1.
+这个用于计算 `auto-encoder` 的 `reconstruction error`。注意 0<=target[i]<=1。
 
-By default, the losses are averaged for each minibatch over observations as well as over dimensions. However, if the field size_average is set to False, the losses are instead summed.
+默认情况下，loss会基于`element`平均，如果`size_average=False`的话，`loss`会被累加。
 
 ### class torch.nn.MarginRankingLoss(margin=0, size_average=True)[source]
 Creates a criterion that measures the loss given inputs x1, x2, two 1D min-batch Tensor`s, and a label 1D mini-batch tensor `y with values (1 or -1).
