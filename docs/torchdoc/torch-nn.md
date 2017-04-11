@@ -840,24 +840,32 @@ $x$和$y$可以是任意形状，且都有`n`的元素，`loss`的求和操作�
 `margin`的默认值为1,可以通过构造函数来设置。
 
 ### class torch.nn.MultiLabelMarginLoss(size_average=True)[source]
+计算多标签分类的 `hinge loss`(`margin-based loss`) ，计算`loss`时需要两个输入： input x(`2-D mini-batch Tensor`)，和 output y(`2-D tensor`表示mini-batch中样本类别的索引)。
 
-Creates a criterion that optimizes a multi-class multi-classification hinge loss (margin-based loss) between input x (a 2D mini-batch Tensor) and output y (which is a 2D Tensor of target class indices). For each sample in the mini-batch:
+$$
+loss(x, y) = \frac{1}{x.size(0)}\sum_{i=0,j=0}^{I,J}(max(0, 1 - (x[y[j]] - x[i])))
+$$
+其中 `I=x.size(0),J=y.size(0)`。对于所有的 `i`和 `j`，满足 $y[j]\neq0, i \neq y[j]$
 
-loss(x, y) = sum_ij(max(0, 1 - (x[y[j]] - x[i]))) / x.size(0)
-where i == 0 to x.size(0), j == 0 to y.size(0), y[j] != 0, and i != y[j] for all i and j.
+`x` 和 `y` 必须具有同样的 `size`。
 
-y and x must have the same size.
-
-The criterion only considers the first non zero y[j] targets.
-
-This allows for different samples to have variable amounts of target classes
+这个标准仅考虑了第一个非零 `y[j] targets`
+此标准允许了，对于每个样本来说，可以有多个类别。
 
 ### class torch.nn.SmoothL1Loss(size_average=True)[source]
-Creates a criterion that uses a squared term if the absolute element-wise error falls below 1 and an L1 term otherwise. It is less sensitive to outliers than the MSELoss and in some cases prevents exploding gradients (e.g. see “Fast R-CNN” paper by Ross Girshick). Also known as the Huber loss:
+平滑版`L1 loss`。
 
-                      { 0.5 * (x_i - y_i)^2, if |x_i - y_i| < 1
-loss(x, y) = 1/n \sum {
-                      { |x_i - y_i| - 0.5,   otherwise
+loss的公式如下：
+$$
+loss(x, y) = \frac{1}{n}\sum_i
+\begin{cases}
+0.5*(x_i-y_i)^2, & if~|x_i - y_i| < 1\\
+|x_i - y_i| - 0.5,  & otherwise    
+\end{cases}
+$$
+此loss对于异常点的敏感性不如`MSELoss`，而且，在某些情况下防止了梯度爆炸，(参照 `Fast R-CNN`)。这个`loss`有时也被称为 `Huber loss`。
+
+
 x and y arbitrary shapes with a total of n elements each the sum operation still operates over all the elements, and divides by n.
 
 The division by n can be avoided if one sets the internal variable size_average to False
