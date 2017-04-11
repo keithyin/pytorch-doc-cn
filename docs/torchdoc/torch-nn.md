@@ -865,12 +865,11 @@ loss(x, y) = \frac{1}{n}\sum_i
 $$
 此loss对于异常点的敏感性不如`MSELoss`，而且，在某些情况下防止了梯度爆炸，(参照 `Fast R-CNN`)。这个`loss`有时也被称为 `Huber loss`。
 
-
-x and y arbitrary shapes with a total of n elements each the sum operation still operates over all the elements, and divides by n.
-
-The division by n can be avoided if one sets the internal variable size_average to False
+x 和 y 可以是任何包含`n`个元素的tensor。默认情况下，求出来的`loss`会除以`n`，可以通过设置`size_average=True`使loss累加。
 
 ### class torch.nn.SoftMarginLoss(size_average=True)[source]
+
+
 Creates a criterion that optimizes a two-class classification logistic loss between input x (a 2D mini-batch Tensor) and target y (which is a tensor containing either 1 or -1).
 
 loss(x, y) = sum_i (log(1 + exp(-y[i]* x[i]))) / x.nelement()
