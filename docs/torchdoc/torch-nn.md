@@ -813,28 +813,34 @@ $$
 默认情况下，loss会基于`element`平均，如果`size_average=False`的话，`loss`会被累加。
 
 ### class torch.nn.MarginRankingLoss(margin=0, size_average=True)[source]
-Creates a criterion that measures the loss given inputs x1, x2, two 1D min-batch Tensor`s, and a label 1D mini-batch tensor `y with values (1 or -1).
 
-If y == 1 then it assumed the first input should be ranked higher (have a larger value) than the second input, and vice-versa for y == -1.
+创建一个标准，给定输入 $x1$,$x2$两个1-D mini-batch Tensor's，和一个$y$(1-D mini-batch tensor) ,$y$里面的值只能是-1或1。
 
-The loss function for each sample in the mini-batch is:
+如果 `y=1`，代表第一个输入的值应该大于第二个输入的值，如果`y=-1`的话，则相反。
 
-loss(x, y) = max(0, -y * (x1 - x2) + margin)
-if the internal variable size_average = True, the loss function averages the loss over the batch samples; if size_average = False, then the loss function sums over the batch samples. By default, size_average equals to True.
+`mini-batch`中每个样本的loss的计算公式如下：
+
+$$loss(x, y) = max(0, -y * (x1 - x2) + margin)$$
+
+如果`size_average=True`,那么求出的`loss`将会对`mini-batch`求平均，反之，求出的`loss`会累加。默认情况下，`size_average=True`。
 
 ### class torch.nn.HingeEmbeddingLoss(size_average=True)[source]
-Measures the loss given an input x which is a 2D mini-batch tensor and a labels y, a 1D tensor containg values (1 or -1). This is usually used for measuring whether two inputs are similar or dissimilar, e.g. using the L1 pairwise distance, and is typically used for learning nonlinear embeddings or semi-supervised learning:
 
-                 { x_i,                  if y_i ==  1
-loss(x, y) = 1/n {
-                 { max(0, margin - x_i), if y_i == -1
-x and y arbitrary shapes with a total of n elements each the sum operation still operates over all the elements, and divides by n.
+给定一个输入 $x$(2-D mini-batch tensor)和对应的 标签 $y$ (1-D tensor,1,-1)，此函数用来计算之间的损失值。这个`loss`通常用来测量两个输入是否相似，即：使用L1 成对距离。典型是用在学习非线性 `embedding`或者半监督学习中：
 
-The division by n can be avoided if one sets the internal variable size_average=False.
+$$
+loss(x,y)=\frac{1}{n}\sum_i
+\begin{cases}
+x_i, &\text if~y_i==1 \\
+max(0, margin-x_i), &if ~y_i==-1
+\end{cases}
+$$
+$x$和$y$可以是任意形状，且都有`n`的元素，`loss`的求和操作作用在所有的元素上，然后除以`n`。如果您不想除以`n`的话，可以通过设置`size_average=False`。
 
-The margin has a default value of 1, or can be set in the constructor.
+`margin`的默认值为1,可以通过构造函数来设置。
 
 ### class torch.nn.MultiLabelMarginLoss(size_average=True)[source]
+
 Creates a criterion that optimizes a multi-class multi-classification hinge loss (margin-based loss) between input x (a 2D mini-batch Tensor) and output y (which is a 2D Tensor of target class indices). For each sample in the mini-batch:
 
 loss(x, y) = sum_ij(max(0, 1 - (x[y[j]] - x[i]))) / x.size(0)
@@ -859,7 +865,7 @@ The division by n can be avoided if one sets the internal variable size_average 
 ### class torch.nn.SoftMarginLoss(size_average=True)[source]
 Creates a criterion that optimizes a two-class classification logistic loss between input x (a 2D mini-batch Tensor) and target y (which is a tensor containing either 1 or -1).
 
-loss(x, y) = sum_i (log(1 + exp(-y[i]*x[i]))) / x.nelement()
+loss(x, y) = sum_i (log(1 + exp(-y[i]* x[i]))) / x.nelement()
 The normalization by the number of elements in the input can be disabled by setting self.size_average to False.
 
 class torch.nn.MultiLabelSoftMarginLoss(weight=None, size_average=True)[source]
