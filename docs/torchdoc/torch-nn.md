@@ -1103,20 +1103,20 @@ Packs a Variable containing padded sequences of variable length.
 
 ### torch.nn.utils.rnn.pad_packed_sequence(sequence, batch_first=False)[source]
 
+填充变长序列的打包的batch
 Pads a packed batch of variable length sequences.
+这个操作和pack_padded_sequence()是相反的。
 
-It is an inverse operation to pack_padded_sequence().
+返回的Varaible的值的`size`是 `T×B×*`, `T` 是最长序列的长度，`B` 是 batch_size,如果 `batch_first=True`,那么返回值是`B×T×*`。
 
-The returned Variable’s data will be of size TxBx*, where T is the length of the longest sequence and B is the batch size. If batch_size is True, the data will be transposed into BxTx* format.
+Batch中的元素将会以它们长度的逆序排列。
 
-Batch elements will be ordered decreasingly by their length.
 
 参数说明:
 
-- sequence (PackedSequence) – batch to pad
+- sequence (PackedSequence) – 将要被填充的 batch
 
-- batch_first (bool, optional) – if True, the output will be in BxTx* format.
+- batch_first (bool, optional) – 如果为True，返回的数据的格式为 `B×T×*`。
 
 返回值:
-
-Tuple of Variable containing the padded sequence, and a list of lengths of each sequence in the batch.
+一个tuple，包含被填充后的序列，和batch中序列的长度列表。
