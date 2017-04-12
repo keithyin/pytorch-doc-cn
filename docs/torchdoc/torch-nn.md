@@ -919,17 +919,23 @@ $$
 ## Vision layers
 
 ### class torch.nn.PixelShuffle(upscale_factor)[source]
-Rearranges elements in a Tensor of shape (∗,C∗r2,H,W](∗,C∗r2,H,W] to a tensor of shape (C,H∗r,W∗r)(C,H∗r,W∗r).
 
-This is useful for implementing efficient sub-pixel convolution with a stride of 1/r1/r.
+将shape为$[N, C*r^2, H, W]$的`Tensor`重新排列为shape为$[N, C, H*r, W*r]$的Tensor。
+当使用`stride=1/r` 的sub-pixel卷积的时候，这个方法是非常有用的。
 
-Look at the paper: Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network by Shi et. al (2016) for more details
+请看paper[Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network by Shi et. al (2016)](https://arxiv.org/abs/1609.05158) 获取详细信息。
 
-Parameters:	upscale_factor (int) – factor to increase spatial resolution by
+参数说明：
+
+- upscale_factor (int) – 增加空间分辨率的因子
+
 Shape:
-Input: (N,C∗upscale_factor2,H,W)(N,C∗upscale_factor2,H,W)
-Output: (N,C,H∗upscale_factor,W∗upscale_factor)(N,C,H∗upscale_factor,W∗upscale_factor)
-Examples:
+
+- Input: $[N,C*upscale\_factor^2,H,W$]
+
+- Output: $[N,C,H*upscale\_factor,W*upscale\_factor]$
+
+例子:
 ```python
 >>> ps = nn.PixelShuffle(3)
 >>> input = autograd.Variable(torch.Tensor(1, 9, 4, 4))
@@ -940,19 +946,24 @@ torch.Size([1, 1, 12, 12])
 
 
 ### class torch.nn.UpsamplingNearest2d(size=None, scale_factor=None)[source]
-Applies a 2D nearest neighbor upsampling to an input signal composed of several input channels.
 
-To specify the scale, it takes either the size or the scale_factor as it’s constructor argument.
+对于多channel 输入 进行 `2-D` 最近邻上采样。
 
-When size is given, it is the output size of the image (h, w).
+可以通过`size`或者`scale_factor`来指定上采样后的图片大小。
 
-Parameters:
-size (tuple, optional) – a tuple of ints (H_out, W_out) output sizes
-scale_factor (int, optional) – the multiplier for the image height / width
-Shape:
-Input: (N,C,Hin,Win)(N,C,Hin,Win)
-Output: (N,C,Hout,Wout)(N,C,Hout,Wout) where Hout=floor(Hin∗scale_factor)Hout=floor(Hin∗scale_factor) Wout=floor(Win∗scale_factor)Wout=floor(Win∗scale_factor)
-Examples:
+当给定`size`时，`size`的值将会是输出图片的大小。
+
+参数：
+
+- size (tuple, optional) – 一个包含两个整数的元组 (H_out, W_out)指定了输出的长宽
+- scale_factor (int, optional) – 长和宽的一个乘子
+
+形状：
+
+- Input: (N,C,H_in,W_in)
+- Output: (N,C,H_out,W_out)  Hout=floor(H_in∗scale_factor) Wout=floor(W_in∗scale_factor)
+
+例子：
 ```python
 >>> inp
 Variable containing:
@@ -972,20 +983,25 @@ Variable containing:
 [torch.FloatTensor of size 1x1x4x4]
 ```
 
-###class torch.nn.UpsamplingBilinear2d(size=None, scale_factor=None)[source]
-Applies a 2D bilinear upsampling to an input signal composed of several input channels.
+### class torch.nn.UpsamplingBilinear2d(size=None, scale_factor=None)[source]
 
-To specify the scale, it takes either the size or the scale_factor as it’s constructor argument.
+对于多channel 输入 进行 `2-D` `bilinear` 上采样。
 
-When size is given, it is the output size of the image (h, w).
+可以通过`size`或者`scale_factor`来指定上采样后的图片大小。
 
-Parameters:
-size (tuple, optional) – a tuple of ints (H_out, W_out) output sizes
-scale_factor (int, optional) – the multiplier for the image height / width
-Shape:
-Input: (N,C,Hin,Win)(N,C,Hin,Win)
-Output: (N,C,Hout,Wout)(N,C,Hout,Wout) where Hout=floor(Hin∗scale_factor)Hout=floor(Hin∗scale_factor) Wout=floor(Win∗scale_factor)Wout=floor(Win∗scale_factor)
-Examples:
+当给定`size`时，`size`的值将会是输出图片的大小。
+
+参数：
+
+- size (tuple, optional) – 一个包含两个整数的元组 (H_out, W_out)指定了输出的长宽
+- scale_factor (int, optional) – 长和宽的一个乘子
+
+形状：
+
+- Input: (N,C,H_in,W_in)
+- Output: (N,C,H_out,W_out)  Hout=floor(H_in∗scale_factor) Wout=floor(W_in∗scale_factor)
+
+例子：
 ```python
 >>> inp
 Variable containing:
@@ -1009,23 +1025,26 @@ Variable containing:
 
 在模块级别上实现数据并行。
 
-This container parallelizes the application of the given module by splitting the input across the specified devices by chunking in the batch dimension. In the forward pass, the module is replicated on each device, and each replica handles a portion of the input. During the backwards pass, gradients from each replica are summed into the original module.
+此容器通过将`mini-batch`划分到不同的设备上来实现给定`module`的并行。在`forward`过程中，`module`会在每个设备上都复制一遍，每个副本都会处理部分输入。在`backward`过程中，副本上的梯度会累加到原始`module`上。
 
-The batch size should be larger than the number of GPUs used. It should also be an integer multiple of the number of GPUs so that each chunk is the same size (so that each GPU processes the same number of samples).
+batch的大小应该大于所使用的GPU的数量。还应当是GPU个数的整数倍，这样划分出来的每一块都会有相同的样本数量。
 
-See also: Use nn.DataParallel instead of multiprocessing
+请看: [Use nn.DataParallel instead of multiprocessing]()
 
-Arbitrary positional and keyword inputs are allowed to be passed into DataParallel EXCEPT Tensors. All variables will be scattered on dim specified (default 0). Primitive types will be broadcasted, but all other types will be a shallow copy and can be corrupted if written to in the model’s forward pass.
+除了`Tensor`，任何位置参数和关键字参数都可以传到DataParallel中。所有的变量会通过指定的`dim`来划分（默认值为0）。原始类型将会被广播，但是所有的其它类型都会被浅复制。所以如果在模型的`forward`过程中写入的话，将会被损坏。
 
-Parameters:
-module – module to be parallelized
-device_ids – CUDA devices (default: all devices)
-output_device – device location of output (default: device_ids[0])
-Example:
+参数说明：
+
+- module – 要被并行的module
+- device_ids – CUDA设备，默认为所有设备。
+- output_device – 输出设备（默认为device_ids[0]）
+
+例子：
 ```python
  net = torch.nn.DataParallel(model, device_ids=[0, 1, 2])
  output = net(input_var)
 ```
+
 ## Utilities
 工具函数
 ### torch.nn.utils.clip_grad_norm(parameters, max_norm, norm_type=2)[source]
