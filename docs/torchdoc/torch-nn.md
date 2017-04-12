@@ -869,44 +869,52 @@ x 和 y 可以是任何包含`n`个元素的tensor。默认情况下，求出来
 
 ### class torch.nn.SoftMarginLoss(size_average=True)[source]
 
+创建一个标准，用来优化2分类的`logistic loss`。输入为 `x`（一个 2-D mini-batch Tensor）和 目标`y`（一个包含1或-1的Tensor）。
+$$
+loss(x, y) = \frac{1}{x.nelement()}\sum_i (log(1 + exp(-y[i]* x[i])))
+$$
+如果求出的`loss`不想被平均可以通过设置`size_average=False`。
 
-Creates a criterion that optimizes a two-class classification logistic loss between input x (a 2D mini-batch Tensor) and target y (which is a tensor containing either 1 or -1).
+### class torch.nn.MultiLabelSoftMarginLoss(weight=None, size_average=True)[source]
 
-loss(x, y) = sum_i (log(1 + exp(-y[i]* x[i]))) / x.nelement()
-The normalization by the number of elements in the input can be disabled by setting self.size_average to False.
-
-class torch.nn.MultiLabelSoftMarginLoss(weight=None, size_average=True)[source]
-Creates a criterion that optimizes a multi-label one-versus-all loss based on max-entropy, between input x (a 2D mini-batch Tensor) and target y (a binary 2D Tensor). For each sample in the minibatch:
-
-loss(x, y) = - sum_i (y[i] log( exp(x[i]) / (1 + exp(x[i])))
-                      + (1-y[i]) log(1/(1+exp(x[i])))) / x:nElement()
-where i == 0 to x.nElement()-1, y[i] in {0,1}. y and x must have the same size.
+创建一个标准，基于输入x和目标y的 `max-entropy`，优化多标签 `one-versus-all` 的损失。`x`:2-D mini-batch Tensor;`y`:binary 2D Tensor。对每个mini-batch中的样本，对应的loss为：
+$$
+loss(x, y) = - \frac{1}{x.nElement()}\sum_{i=0}^I y[i]\text{log}\frac{exp(x[i])}{(1 + exp(x[i])}
+                      + (1-y[i])\text{log}\frac{1}{1+exp(x[i])}
+$$
+其中 `I=x.nElement()-1`, $y[i] \in \{0,1\}$，`y` 和 `x`必须要有同样`size`。
 
 ### class torch.nn.CosineEmbeddingLoss(margin=0, size_average=True)[source]
-Creates a criterion that measures the loss given an input tensors x1, x2 and a Tensor label y with values 1 or -1. This is used for measuring whether two inputs are similar or dissimilar, using the cosine distance, and is typically used for learning nonlinear embeddings or semi-supervised learning.
 
-margin should be a number from -1 to 1, 0 to 0.5 is suggested. If margin is missing, the default value is 0.
+给定 输入 `Tensors`，`x1`, `x2` 和一个标签Tensor `y`(元素的值为1或-1)。此标准使用`cosine`距离测量两个输入是否相似，一般用来用来学习非线性`embedding`或者半监督学习。
 
-The loss function for each sample is:
+`margin`应该是-1到1之间的值，建议使用0到0.5。如果没有传入`margin`实参，默认值为0。
 
-             { 1 - cos(x1, x2),              if y ==  1
-loss(x, y) = {
-             { max(0, cos(x1, x2) - margin), if y == -1
-If the internal variable size_average is equal to True, the loss function averages the loss over the batch samples; if size_average is False, then the loss function sums over the batch samples. By default, size_average = True.
+每个样本的loss是：
+$$
+loss(x, y) =
+\begin{cases}
+1 - cos(x1, x2),              &if~y ==  1 \\
+max(0, cos(x1, x2) - margin), &if~y == -1
+\end{cases}
+$$
+如果`size_average=True` 求出的loss会对batch求均值，如果`size_average=False`的话，则会累加`loss`。默认情况`size_average=True`。
 
-class torch.nn.MultiMarginLoss(p=1, margin=1, weight=None, size_average=True)[source]
-Creates a criterion that optimizes a multi-class classification hinge loss (margin-based loss) between input x (a 2D mini-batch Tensor) and output y (which is a 1D tensor of target class indices, 0 <= y <= x.size(1)):
+### class torch.nn.MultiMarginLoss(p=1, margin=1, weight=None, size_average=True)[source]
+用来计算multi-class classification的hinge loss（magin-based loss）。输入是 `x`(2D mini-batch Tensor), `y`(1D Tensor)包含类别的索引， `0 <= y <= x.size(1))`。
 
-For each mini-batch sample:
+对每个mini-batch样本：
+$$
+loss(x, y) = \frac{1}{x.size(0)}\sum_{i=0}^I(max(0, margin - x[y] + x[i])^p)
+$$
+其中 `I=x.size(0)` $i\neq y$。
+可选择的，如果您不想所有的类拥有同样的权重的话，您可以通过在构造函数中传入`weights`参数来解决这个问题，`weights`是一个1D权重Tensor。
 
-loss(x, y) = sum_i(max(0, (margin - x[y] + x[i]))^p) / x.size(0)
-             where `i == 0` to `x.size(0)` and `i != y`.
-Optionally, you can give non-equal weighting on the classes by passing a 1D weights tensor into the constructor.
-
-The loss function then becomes:
-
-loss(x, y) = sum_i(max(0, w[y] * (margin - x[y] - x[i]))^p) / x.size(0)
-By default, the losses are averaged over observations for each minibatch. However, if the field size_average is set to False, the losses are instead summed.
+传入weights后，loss函数变为：
+$$
+loss(x, y) = \frac{1}{x.size(0)}\sum_imax(0, w[y] * (margin - x[y] - x[i]))^p
+$$
+默认情况下，求出的loss会对mini-batch取平均，可以通过设置`size_average=False`来取消取平均操作。
 
 ## Vision layers
 
