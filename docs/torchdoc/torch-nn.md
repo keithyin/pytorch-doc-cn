@@ -918,6 +918,92 @@ $$
 
 ## Vision layers
 
+### class torch.nn.PixelShuffle(upscale_factor)[source]
+Rearranges elements in a Tensor of shape (∗,C∗r2,H,W](∗,C∗r2,H,W] to a tensor of shape (C,H∗r,W∗r)(C,H∗r,W∗r).
+
+This is useful for implementing efficient sub-pixel convolution with a stride of 1/r1/r.
+
+Look at the paper: Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network by Shi et. al (2016) for more details
+
+Parameters:	upscale_factor (int) – factor to increase spatial resolution by
+Shape:
+Input: (N,C∗upscale_factor2,H,W)(N,C∗upscale_factor2,H,W)
+Output: (N,C,H∗upscale_factor,W∗upscale_factor)(N,C,H∗upscale_factor,W∗upscale_factor)
+Examples:
+```python
+>>> ps = nn.PixelShuffle(3)
+>>> input = autograd.Variable(torch.Tensor(1, 9, 4, 4))
+>>> output = ps(input)
+>>> print(output.size())
+torch.Size([1, 1, 12, 12])
+```
+
+
+### class torch.nn.UpsamplingNearest2d(size=None, scale_factor=None)[source]
+Applies a 2D nearest neighbor upsampling to an input signal composed of several input channels.
+
+To specify the scale, it takes either the size or the scale_factor as it’s constructor argument.
+
+When size is given, it is the output size of the image (h, w).
+
+Parameters:
+size (tuple, optional) – a tuple of ints (H_out, W_out) output sizes
+scale_factor (int, optional) – the multiplier for the image height / width
+Shape:
+Input: (N,C,Hin,Win)(N,C,Hin,Win)
+Output: (N,C,Hout,Wout)(N,C,Hout,Wout) where Hout=floor(Hin∗scale_factor)Hout=floor(Hin∗scale_factor) Wout=floor(Win∗scale_factor)Wout=floor(Win∗scale_factor)
+Examples:
+```python
+>>> inp
+Variable containing:
+(0 ,0 ,.,.) =
+  1  2
+  3  4
+[torch.FloatTensor of size 1x1x2x2]
+
+>>> m = nn.UpsamplingNearest2d(scale_factor=2)
+>>> m(inp)
+Variable containing:
+(0 ,0 ,.,.) =
+  1  1  2  2
+  1  1  2  2
+  3  3  4  4
+  3  3  4  4
+[torch.FloatTensor of size 1x1x4x4]
+```
+
+###class torch.nn.UpsamplingBilinear2d(size=None, scale_factor=None)[source]
+Applies a 2D bilinear upsampling to an input signal composed of several input channels.
+
+To specify the scale, it takes either the size or the scale_factor as it’s constructor argument.
+
+When size is given, it is the output size of the image (h, w).
+
+Parameters:
+size (tuple, optional) – a tuple of ints (H_out, W_out) output sizes
+scale_factor (int, optional) – the multiplier for the image height / width
+Shape:
+Input: (N,C,Hin,Win)(N,C,Hin,Win)
+Output: (N,C,Hout,Wout)(N,C,Hout,Wout) where Hout=floor(Hin∗scale_factor)Hout=floor(Hin∗scale_factor) Wout=floor(Win∗scale_factor)Wout=floor(Win∗scale_factor)
+Examples:
+```python
+>>> inp
+Variable containing:
+(0 ,0 ,.,.) =
+  1  2
+  3  4
+[torch.FloatTensor of size 1x1x2x2]
+
+>>> m = nn.UpsamplingBilinear2d(scale_factor=2)
+>>> m(inp)
+Variable containing:
+(0 ,0 ,.,.) =
+  1.0000  1.3333  1.6667  2.0000
+  1.6667  2.0000  2.3333  2.6667
+  2.3333  2.6667  3.0000  3.3333
+  3.0000  3.3333  3.6667  4.0000
+[torch.FloatTensor of size 1x1x4x4]
+```
 ## Multi-GPU layers
 ### class torch.nn.DataParallel(module, device_ids=None, output_device=None, dim=0)[source]
 
