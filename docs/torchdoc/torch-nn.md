@@ -522,19 +522,24 @@ output, hn = lstm(input, (h0, c0))
 对输入序列中的每个元素，每层进行了一下计算：
 
 $$
-rt=sigmoid(Wirxt+bir+Whrh(t−1)+bhr)it=sigmoid(Wiixt+bii+Whih(t−1)+bhi)nt=tanh(Winxt+bin+rt∗(Whnh(t−1)+bhn))ht=(1−it)∗nt+it∗h(t−1)
-rt=sigmoid(Wirxt+bir+Whrh(t−1)+bhr)it=sigmoid(Wiixt+bii+Whih(t−1)+bhi)nt=tanh⁡(Winxt+bin+rt∗(Whnh(t−1)+bhn))ht=(1−it)∗nt+it∗h(t−1)
+\begin{aligned}
+r_t&=sigmoid(W_{ir}x_t+b_{ir}+W_{hr}h_{(t-1)}+b_{hr})\\
+i_t&=sigmoid(W_{ii}x_t+b_{ii}+W_{hi}h_{(t-1)}+b_{hi})\\
+n_t&=tanh(W_{in}x_t+b_{in}+rt*(W_{hn}h_{(t-1)}+b_{hn}))\\
+h_t&=(1-i_t)* nt+i_t*h(t-1)
+\end{aligned}
 $$
-where htht is the hidden state at time t, xtxt is the hidden state of the previous layer at time t or inputtinputt for the first layer, and rtrt, itit, ntnt are the reset, input, and new gates, respectively.
+$h_t$是是时间$t$的上的隐状态，$x_t$是前一层$t$时刻的隐状态或者是第一层的$t$时刻的输入，$r_t, i_t, n_t$分别是重置门，输入门和新门。
 
-Parameters:
-input_size – The number of expected features in the input x
-hidden_size – The number of features in the hidden state h
-num_layers – Number of recurrent layers.
-bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
-batch_first – If True, then the input and output tensors are provided as (batch, seq, feature)
-dropout – If non-zero, introduces a dropout layer on the outputs of each RNN layer except the last layer
-bidirectional – If True, becomes a bidirectional RNN. Default: False
+参数说明：
+- input_size – The number of expected features in the input x
+- hidden_size – The number of features in the hidden state h
+- num_layers – Number of recurrent layers.
+- bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
+- batch_first – If True, then the input and output tensors are provided as (batch, seq, feature)
+- dropout – If non-zero, introduces a dropout layer on the outputs of each RNN layer except the last layer
+- bidirectional – If True, becomes a bidirectional RNN. Default: False
+
 Inputs: input, h_0
 input (seq_len, batch, input_size): tensor containing the features of the input sequence. The input can also be a packed variable length sequence. See torch.nn.utils.rnn.pack_padded_sequence() for details.
 h_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
