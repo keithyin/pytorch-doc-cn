@@ -471,32 +471,41 @@ $h_t$是时刻$t$的隐状态,$c_t$是时刻$t$的细胞状态，$x_t$是上一�
 
 参数说明:
 
-- input_size – The number of expected features in the input x
-- hidden_size – The number of features in the hidden state h
-- num_layers – Number of recurrent layers.
-- bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
-- batch_first – If True, then the input and output tensors are provided as (batch, seq, feature)
-- dropout – If non-zero, introduces a dropout layer on the outputs of each RNN layer except the last layer
-- bidirectional – If True, becomes a bidirectional RNN. Default: False
+- input_size – 输入的特征维度
+- hidden_size – 隐状态的特征维度
+- num_layers – 层数（和时序展开要区分开）
+- bias – 如果为`False`，那么`LSTM`将不会使用$b_{ih},b_{hh}$，默认为`True`。
+- batch_first – 如果为`True`，那么输入和输出`Tensor`的形状为`(batch, seq, feature)`
+- dropout – 如果非零的话，将会在`RNN`的输出上加个`dropout`，最后一层除外。
+- bidirectional – 如果为`True`，将会变成一个双向`RNN`，默认为`False`。
 
 `LSTM`输入:
 input, (h_0, c_0)
 
-- input (seq_len, batch, input_size): tensor containing the features of the input sequence. The input can also be a packed variable length sequence. See torch.nn.utils.rnn.pack_padded_sequence() for details.
-- h_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
-- c_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial cell state for each element in the batch.
+- input (seq_len, batch, input_size): 包含输入序列特征的`Tensor`。也可以是`packed variable` ，详见 [pack_padded_sequence](#torch.nn.utils.rnn.pack_padded_sequence(input, lengths, batch_first=False[source])
+
+- h_0 (num_layers * num_directions, batch, hidden_size):保存着`batch`中每个元素的初始化隐状态的`Tensor`
+
+- c_0 (num_layers * num_directions, batch, hidden_size): 保存着`batch`中每个元素的初始化细胞状态的`Tensor`
 
 `LSTM`输出
 output, (h_n, c_n)
-- output (seq_len, batch, hidden_size * num_directions): tensor containing the output features (h_t) from the last layer of the RNN, for each t. If a torch.nn.utils.rnn.PackedSequence has been given as the input, the output will also be a packed sequence.
-- h_n (num_layers * num_directions, batch, hidden_size): tensor containing the hidden state for t=seq_len
-- c_n (num_layers * num_directions, batch, hidden_size): tensor containing the cell state for t=seq_len
+
+- output (seq_len, batch, hidden_size * num_directions): 保存`RNN`最后一层的输出的`Tensor`。 如果输入是`torch.nn.utils.rnn.PackedSequence`，那么输出也是`torch.nn.utils.rnn.PackedSequence`。
+
+- h_n (num_layers * num_directions, batch, hidden_size): `Tensor`，保存着`RNN`最后一个时间步的隐状态。
+
+- c_n (num_layers * num_directions, batch, hidden_size): `Tensor`，保存着`RNN`最后一个时间步的细胞状态。
 
 `LSTM`模型参数:
-- weight_ih_l[k] – the learnable input-hidden weights of the k-th layer (W_ii|W_if|W_ig|W_io), of shape (input_size x 4*hidden_size)
-- weight_hh_l[k] – the learnable hidden-hidden weights of the k-th layer (W_hi|W_hf|W_hg|W_ho), of shape (hidden_size x 4*hidden_size)
-- bias_ih_l[k] – the learnable input-hidden bias of the k-th layer (b_ii|b_if|b_ig|b_io), of shape (4*hidden_size)
-- bias_hh_l[k] – the learnable hidden-hidden bias of the k-th layer (W_hi|W_hf|W_hg|b_ho), of shape (4*hidden_size)
+
+- weight_ih_l[k] – 第`k`层可学习的`input-hidden`权重($W_{ii}|W_{if}|W_{ig}|W_{io}$)，形状为`(input_size x 4*hidden_size)`
+
+- weight_hh_l[k] – 第`k`层可学习的`hidden-hidden`权重($W_{hi}|W_{hf}|W_{hg}|W_{ho}$)，形状为`(hidden_size x 4*hidden_size)`。
+
+- bias_ih_l[k] – 第`k`层可学习的`input-hidden`偏置($b_{ii}|b_{if}|b_{ig}|b_{io}$)，形状为`( 4*hidden_size)`
+
+- bias_hh_l[k] – 第`k`层可学习的`hidden-hidden`偏置($b_{hi}|b_{hf}|b_{hg}|b_{ho}$)，形状为`( 4*hidden_size)`。
 示例:
 ```python
 lstm = nn.LSTM(10, 20, 2)
@@ -507,12 +516,15 @@ output, hn = lstm(input, (h0, c0))
 ```
 
 ### class torch.nn.GRU(* args, ** kwargs)[source]
-Applies a multi-layer gated recurrent unit (GRU) RNN to an input sequence.
 
-For each element in the input sequence, each layer computes the following function:
+将一个多层的`GRU`用于输入序列。
 
+对输入序列中的每个元素，每层进行了一下计算：
+
+$$
 rt=sigmoid(Wirxt+bir+Whrh(t−1)+bhr)it=sigmoid(Wiixt+bii+Whih(t−1)+bhi)nt=tanh(Winxt+bin+rt∗(Whnh(t−1)+bhn))ht=(1−it)∗nt+it∗h(t−1)
 rt=sigmoid(Wirxt+bir+Whrh(t−1)+bhr)it=sigmoid(Wiixt+bii+Whih(t−1)+bhi)nt=tanh⁡(Winxt+bin+rt∗(Whnh(t−1)+bhn))ht=(1−it)∗nt+it∗h(t−1)
+$$
 where htht is the hidden state at time t, xtxt is the hidden state of the previous layer at time t or inputtinputt for the first layer, and rtrt, itit, ntnt are the reset, input, and new gates, respectively.
 
 Parameters:
