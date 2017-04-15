@@ -472,11 +472,17 @@ $h_t$是时刻$t$的隐状态,$c_t$是时刻$t$的细胞状态，$x_t$是上一�
 参数说明:
 
 - input_size – 输入的特征维度
+
 - hidden_size – 隐状态的特征维度
+
 - num_layers – 层数（和时序展开要区分开）
+
 - bias – 如果为`False`，那么`LSTM`将不会使用$b_{ih},b_{hh}$，默认为`True`。
+
 - batch_first – 如果为`True`，那么输入和输出`Tensor`的形状为`(batch, seq, feature)`
+
 - dropout – 如果非零的话，将会在`RNN`的输出上加个`dropout`，最后一层除外。
+
 - bidirectional – 如果为`True`，将会变成一个双向`RNN`，默认为`False`。
 
 `LSTM`输入:
@@ -532,26 +538,40 @@ $$
 $h_t$是是时间$t$的上的隐状态，$x_t$是前一层$t$时刻的隐状态或者是第一层的$t$时刻的输入，$r_t, i_t, n_t$分别是重置门，输入门和新门。
 
 参数说明：
-- input_size – The number of expected features in the input x
-- hidden_size – The number of features in the hidden state h
-- num_layers – Number of recurrent layers.
-- bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
-- batch_first – If True, then the input and output tensors are provided as (batch, seq, feature)
-- dropout – If non-zero, introduces a dropout layer on the outputs of each RNN layer except the last layer
-- bidirectional – If True, becomes a bidirectional RNN. Default: False
+- input_size – 期望的输入$x$的特征值的维度
+- hidden_size – 隐状态的维度
+- num_layers – `RNN`的层数。
+- bias – 如果为`False`，那么`RNN`层将不会使用`bias`，默认为`True`。
+- batch_first – 如果为`True`的话，那么输入和输出的`tensor`的形状是`(batch, seq, feature)`。
+- dropout –  如果非零的话，将会在`RNN`的输出上加个`dropout`，最后一层除外。
+- bidirectional – 如果为`True`，将会变成一个双向`RNN`，默认为`False`。
 
-Inputs: input, h_0
-input (seq_len, batch, input_size): tensor containing the features of the input sequence. The input can also be a packed variable length sequence. See torch.nn.utils.rnn.pack_padded_sequence() for details.
-h_0 (num_layers * num_directions, batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
-Outputs: output, h_n
-output (seq_len, batch, hidden_size * num_directions): tensor containing the output features h_t from the last layer of the RNN, for each t. If a torch.nn.utils.rnn.PackedSequence has been given as the input, the output will also be a packed sequence.
-h_n (num_layers * num_directions, batch, hidden_size): tensor containing the hidden state for t=seq_len
-Variables:
-weight_ih_l[k] – the learnable input-hidden weights of the k-th layer (W_ir|W_ii|W_in), of shape (input_size x 3*hidden_size)
-weight_hh_l[k] – the learnable hidden-hidden weights of the k-th layer (W_hr|W_hi|W_hn), of shape (hidden_size x 3*hidden_size)
-bias_ih_l[k] – the learnable input-hidden bias of the k-th layer (b_ir|b_ii|b_in), of shape (3*hidden_size)
-bias_hh_l[k] – the learnable hidden-hidden bias of the k-th layer (W_hr|W_hi|W_hn), of shape (3*hidden_size)
-Examples:
+输入：
+input, h_0
+
+- input (seq_len, batch, input_size):  包含输入序列特征的`Tensor`。也可以是`packed variable` ，详见 [pack_padded_sequence](#torch.nn.utils.rnn.pack_padded_sequence(input, lengths, batch_first=False[source])。
+
+- h_0 (num_layers * num_directions, batch, hidden_size):保存着`batch`中每个元素的初始化隐状态的`Tensor`
+
+输出：
+output, h_n
+
+- output (seq_len, batch, hidden_size * num_directions): ten保存`RNN`最后一层的输出的`Tensor`。 如果输入是`torch.nn.utils.rnn.PackedSequence`，那么输出也是`torch.nn.utils.rnn.PackedSequence`。
+
+- h_n (num_layers * num_directions, batch, hidden_size): `Tensor`，保存着`RNN`最后一个时间步的隐状态。
+
+变量：
+
+- weight_ih_l[k] – 第`k`层可学习的`input-hidden`权重($W_{ir}|W_{ii}|W_{in}$)，形状为`(input_size x 3*hidden_size)`
+
+- weight_hh_l[k] – 第`k`层可学习的`hidden-hidden`权重($W_{hr}|W_{hi}|W_{hn}$)，形状为`(hidden_size x 3*hidden_size)`。
+
+- bias_ih_l[k] – 第`k`层可学习的`input-hidden`偏置($b_{ir}|b_{ii}|b_{in}$)，形状为`( 3*hidden_size)`
+
+- bias_hh_l[k] – 第`k`层可学习的`hidden-hidden`偏置($b_{hr}|b_{hi}|b_{hn}$)，形状为`( 3*hidden_size)`。
+
+
+例子：
 ```python
  rnn = nn.GRU(10, 20, 2)
  input = Variable(torch.randn(5, 3, 10))
@@ -560,99 +580,163 @@ Examples:
 ```
 
 ### class torch.nn.RNNCell(input_size, hidden_size, bias=True, nonlinearity='tanh')[source]
-An Elman RNN cell with tanh or ReLU non-linearity.
 
-h′=tanh(wih∗x+bih+whh∗h+bhh)
-h′=tanh⁡(wih∗x+bih+whh∗h+bhh)
-If nonlinearity=’relu’, then ReLU is used in place of tanh.
+一个 `Elan RNN cell`，激活函数是`tanh`或`ReLU`，用于输入序列。
+将一个多层的 `Elman RNNCell`，激活函数为`tanh`或者`ReLU`，用于输入序列。
+$$
+h'=tanh(w_{ih}* x+b_{ih}+w_{hh}* h+b_{hh})
+$$
+如果`nonlinearity=relu`，那么将会使用`ReLU`来代替`tanh`。
 
-Parameters:
-input_size – The number of expected features in the input x
-hidden_size – The number of features in the hidden state h
-bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
-nonlinearity – The non-linearity to use [‘tanh’|’relu’]. Default: ‘tanh’
-Inputs: input, hidden
-input (batch, input_size): tensor containing input features
-hidden (batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
-Outputs: h’
-h’ (batch, hidden_size): tensor containing the next hidden state for each element in the batch
-Variables:
-weight_ih – the learnable input-hidden weights, of shape (input_size x hidden_size)
-weight_hh – the learnable hidden-hidden weights, of shape (hidden_size x hidden_size)
-bias_ih – the learnable input-hidden bias, of shape (hidden_size)
-bias_hh – the learnable hidden-hidden bias, of shape (hidden_size)
-Examples:
+参数：
+
+- input_size – 输入$x$，特征的维度。
+
+- hidden_size – 隐状态特征的维度。
+
+- bias – 如果为`False`，`RNN cell`中将不会加入`bias`，默认为`True`。
+
+- nonlinearity – 用于选择非线性激活函数 [`tanh`|`relu`]. 默认值为： `tanh`
+
+输入：
+input, hidden
+
+- input (batch, input_size): 包含输入特征的`tensor`。
+
+- hidden (batch, hidden_size): 保存着初始隐状态值的`tensor`。
+
+输出： h’
+
+- h’ (batch, hidden_size):下一个时刻的隐状态。
+
+变量：
+
+- weight_ih –  `input-hidden` 权重， 可学习，形状是`(input_size x hidden_size)`。
+
+- weight_hh –  `hidden-hidden` 权重， 可学习，形状是`(hidden_size x hidden_size)`
+
+- bias_ih –  `input-hidden` 偏置， 可学习，形状是`(hidden_size)`
+
+- bias_hh –  `hidden-hidden` 偏置， 可学习，形状是`(hidden_size)`
+
+例子：
+
 ```python
- rnn = nn.RNNCell(10, 20)
- input = Variable(torch.randn(6, 3, 10))
- hx = Variable(torch.randn(3, 20))
- output = []
- for i in range(6):
-...     hx = rnn(input[i], hx)
-...     output.append(hx)
+rnn = nn.RNNCell(10, 20)
+input = Variable(torch.randn(6, 3, 10))
+hx = Variable(torch.randn(3, 20))
+output = []
+for i in range(6):
+   hx = rnn(input[i], hx)
+   output.append(hx)
 ```
 
 ### class torch.nn.LSTMCell(input_size, hidden_size, bias=True)[source]
-A long short-term memory (LSTM) cell.
 
-i=sigmoid(Wiix+bii+Whih+bhi)f=sigmoid(Wifx+bif+Whfh+bhf)g=tanh(Wigx+big+Whch+bhg)o=sigmoid(Wiox+bio+Whoh+bho)c′=f∗c+i∗gh′=o∗tanh(ct)
-i=sigmoid(Wiix+bii+Whih+bhi)f=sigmoid(Wifx+bif+Whfh+bhf)g=tanh⁡(Wigx+big+Whch+bhg)o=sigmoid(Wiox+bio+Whoh+bho)c′=f∗c+i∗gh′=o∗tanh⁡(ct)
-Parameters:
-input_size – The number of expected features in the input x
-hidden_size – The number of features in the hidden state h
-bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
-Inputs: input, (h_0, c_0)
-input (batch, input_size): tensor containing input features
-h_0 (batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
-c_0 (batch. hidden_size): tensor containing the initial cell state for each element in the batch.
-Outputs: h_1, c_1
-h_1 (batch, hidden_size): tensor containing the next hidden state for each element in the batch
-c_1 (batch, hidden_size): tensor containing the next cell state for each element in the batch
-Variables:
-weight_ih – the learnable input-hidden weights, of shape (input_size x hidden_size)
-weight_hh – the learnable hidden-hidden weights, of shape (hidden_size x hidden_size)
-bias_ih – the learnable input-hidden bias, of shape (hidden_size)
-bias_hh – the learnable hidden-hidden bias, of shape (hidden_size)
+`LSTM cell`。
+$$
+\begin{aligned}
+i &= sigmoid(W_{ii}x+b_{ii}+W_{hi}h+b_{hi}) \\
+f &= sigmoid(W_{if}x+b_{if}+W_{hf}h+b_{hf}) \\
+o &= sigmoid(W_{io}x+b_{io}+W_{ho}h+b_{ho})\\
+g &= tanh(W_{ig}x+b_{ig}+W_{hg}h+b_{hg})\\
+c' &= f_t*c_{t-1}+i_t*g_t\\
+h' &= o_t*tanh(c')
+\end{aligned}
+$$
+
+参数：
+
+- input_size – 输入的特征维度。
+- hidden_size – 隐状态的维度。
+- bias – 如果为`False`，那么将不会使用`bias`。默认为`True`。
+
+`LSTM`输入:
+input, (h_0, c_0)
+
+- input (seq_len, batch, input_size): 包含输入序列特征的`Tensor`。也可以是`packed variable` ，详见 [pack_padded_sequence](#torch.nn.utils.rnn.pack_padded_sequence(input, lengths, batch_first=False[source])
+
+- h_0 ( batch, hidden_size):保存着`batch`中每个元素的初始化隐状态的`Tensor`
+
+- c_0 (batch, hidden_size): 保存着`batch`中每个元素的初始化细胞状态的`Tensor`
+
+输出：
+h_1, c_1
+
+- h_1 (batch, hidden_size): 下一个时刻的隐状态。
+- c_1 (batch, hidden_size): 下一个时刻的细胞状态。
+
+`LSTM`模型参数:
+
+- weight_ih – `input-hidden`权重($W_{ii}|W_{if}|W_{ig}|W_{io}$)，形状为`(input_size x 4*hidden_size)`
+
+- weight_hh – `hidden-hidden`权重($W_{hi}|W_{hf}|W_{hg}|W_{ho}$)，形状为`(hidden_size x 4*hidden_size)`。
+
+- bias_ih – `input-hidden`偏置($b_{ii}|b_{if}|b_{ig}|b_{io}$)，形状为`( 4*hidden_size)`
+
+- bias_hh – `hidden-hidden`偏置($b_{hi}|b_{hf}|b_{hg}|b_{ho}$)，形状为`( 4*hidden_size)`。
+
 Examples:
 ```python
- rnn = nn.LSTMCell(10, 20)
- input = Variable(torch.randn(6, 3, 10))
- hx = Variable(torch.randn(3, 20))
- cx = Variable(torch.randn(3, 20))
- output = []
- for i in range(6):
-...     hx, cx = rnn(input[i], (hx, cx))
-...     output.append(hx)
+rnn = nn.LSTMCell(10, 20)
+input = Variable(torch.randn(6, 3, 10))
+hx = Variable(torch.randn(3, 20))
+cx = Variable(torch.randn(3, 20))
+output = []
+for i in range(6):
+   hx, cx = rnn(input[i], (hx, cx))
+   output.append(hx)
 ```
 
 ### class torch.nn.GRUCell(input_size, hidden_size, bias=True)[source]
-A gated recurrent unit (GRU) cell
 
-r=sigmoid(Wirx+bir+Whrh+bhr)i=sigmoid(Wiix+bii+Whih+bhi)n=tanh(Winx+bin+r∗(Whnh+bhn))h′=(1−i)∗n+i∗h
-r=sigmoid(Wirx+bir+Whrh+bhr)i=sigmoid(Wiix+bii+Whih+bhi)n=tanh⁡(Winx+bin+r∗(Whnh+bhn))h′=(1−i)∗n+i∗h
-Parameters:
-input_size – The number of expected features in the input x
-hidden_size – The number of features in the hidden state h
-bias – If False, then the layer does not use bias weights b_ih and b_hh. Default: True
-Inputs: input, hidden
-input (batch, input_size): tensor containing input features
-hidden (batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
-Outputs: h’
-h’: (batch, hidden_size): tensor containing the next hidden state for each element in the batch
-Variables:
-weight_ih – the learnable input-hidden weights, of shape (input_size x hidden_size)
-weight_hh – the learnable hidden-hidden weights, of shape (hidden_size x hidden_size)
-bias_ih – the learnable input-hidden bias, of shape (hidden_size)
-bias_hh – the learnable hidden-hidden bias, of shape (hidden_size)
-Examples:
+一个`GRU cell`。
+$$
+\begin{aligned}
+r&=sigmoid(W_{ir}x+b_{ir}+W_{hr}h+b_{hr})\\
+i&=sigmoid(W_{ii}x+b_{ii}+W_{hi}h+b_{hi})\\
+n&=tanh(W_{in}x+b_{in}+r*(W_{hn}h+b_{hn}))\\
+h'&=(1-i)* n+i*h
+\end{aligned}
+$$
 
- rnn = nn.GRUCell(10, 20)
- input = Variable(torch.randn(6, 3, 10))
- hx = Variable(torch.randn(3, 20))
- output = []
- for i in range(6):
-...     hx = rnn(input[i], hx)
-...     output.append(hx)
+参数说明：
+- input_size – 期望的输入$x$的特征值的维度
+- hidden_size – 隐状态的维度
+- bias – 如果为`False`，那么`RNN`层将不会使用`bias`，默认为`True`。
+
+输入：
+input, h_0
+
+- input (batch, input_size):  包含输入特征的`Tensor`
+
+- h_0 (batch, hidden_size):保存着`batch`中每个元素的初始化隐状态的`Tensor`
+
+输出：
+h_1
+
+- h_1 (batch, hidden_size): `Tensor`，保存着`RNN`下一个时刻的隐状态。
+
+变量：
+
+- weight_ih – `input-hidden`权重($W_{ir}|W_{ii}|W_{in}$)，形状为`(input_size x 3*hidden_size)`
+
+- weight_hh – `hidden-hidden`权重($W_{hr}|W_{hi}|W_{hn}$)，形状为`(hidden_size x 3*hidden_size)`。
+
+- bias_ih – `input-hidden`偏置($b_{ir}|b_{ii}|b_{in}$)，形状为`( 3*hidden_size)`
+
+- bias_hh – `hidden-hidden`偏置($b_{hr}|b_{hi}|b_{hn}$)，形状为`( 3*hidden_size)`。
+
+例子：
+```python
+rnn = nn.GRUCell(10, 20)
+input = Variable(torch.randn(6, 3, 10))
+hx = Variable(torch.randn(3, 20))
+output = []
+for i in range(6):
+   hx = rnn(input[i], hx)
+   output.append(hx)
+```
 ## Linear layers
 
 ## Dropout layers
