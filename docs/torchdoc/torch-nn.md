@@ -393,7 +393,85 @@ class MyModule(nn.Module):
 ## Non-linear Activations
 
 ## Normalization layers
+### class torch.nn.BatchNorm1d(num_features, eps=1e-05, momentum=0.1, affine=True)[source]
+Applies Batch Normalization over a 2d or 3d input that is seen as a mini-batch.
 
+\[y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * gamma + beta\]
+The mean and standard-deviation are calculated per-dimension over the mini-batches and gamma and beta are learnable parameter vectors of size C (where C is the input size).
+
+During training, this layer keeps a running estimate of its computed mean and variance. The running sum is kept with a default momentum of 0.1.
+
+During evaluation, this running mean/variance is used for normalization.
+
+Parameters:
+num_features – num_features from an expected input of size batch_size x num_features [x width]
+eps – a value added to the denominator for numerical stability. Default: 1e-5
+momentum – the value used for the running_mean and running_var computation. Default: 0.1
+affine – a boolean value that when set to true, gives the layer learnable affine parameters.
+Shape:
+Input: \((N, C)\) or \((N, C, L)\)
+Output: \((N, C)\) or \((N, C, L)\) (same shape as input)
+Examples
+
+>>> # With Learnable Parameters
+>>> m = nn.BatchNorm1d(100)
+>>> # Without Learnable Parameters
+>>> m = nn.BatchNorm1d(100, affine=False)
+>>> input = autograd.Variable(torch.randn(20, 100))
+>>> output = m(input)
+### class torch.nn.BatchNorm2d(num_features, eps=1e-05, momentum=0.1, affine=True)[source]
+Applies Batch Normalization over a 4d input that is seen as a mini-batch of 3d inputs
+
+\[y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * gamma + beta\]
+The mean and standard-deviation are calculated per-dimension over the mini-batches and gamma and beta are learnable parameter vectors of size C (where C is the input size).
+
+During training, this layer keeps a running estimate of its computed mean and variance. The running sum is kept with a default momentum of 0.1.
+
+During evaluation, this running mean/variance is used for normalization.
+
+Parameters:
+num_features – num_features from an expected input of size batch_size x num_features x height x width
+eps – a value added to the denominator for numerical stability. Default: 1e-5
+momentum – the value used for the running_mean and running_var computation. Default: 0.1
+affine – a boolean value that when set to true, gives the layer learnable affine parameters.
+Shape:
+Input: \((N, C, H, W)\)
+Output: \((N, C, H, W)\) (same shape as input)
+Examples
+
+>>> # With Learnable Parameters
+>>> m = nn.BatchNorm2d(100)
+>>> # Without Learnable Parameters
+>>> m = nn.BatchNorm2d(100, affine=False)
+>>> input = autograd.Variable(torch.randn(20, 100, 35, 45))
+>>> output = m(input)
+### class torch.nn.BatchNorm3d(num_features, eps=1e-05, momentum=0.1, affine=True)[source]
+Applies Batch Normalization over a 5d input that is seen as a mini-batch of 4d inputs
+
+\[y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * gamma + beta\]
+The mean and standard-deviation are calculated per-dimension over the mini-batches and gamma and beta are learnable parameter vectors of size C (where C is the input size).
+
+During training, this layer keeps a running estimate of its computed mean and variance. The running sum is kept with a default momentum of 0.1.
+
+During evaluation, this running mean/variance is used for normalization.
+
+Parameters:
+num_features – num_features from an expected input of size batch_size x num_features x depth x height x width
+eps – a value added to the denominator for numerical stability. Default: 1e-5
+momentum – the value used for the running_mean and running_var computation. Default: 0.1
+affine – a boolean value that when set to true, gives the layer learnable affine parameters.
+Shape:
+Input: \((N, C, D, H, W)\)
+Output: \((N, C, D, H, W)\) (same shape as input)
+Examples
+```python
+>>> # With Learnable Parameters
+>>> m = nn.BatchNorm3d(100)
+>>> # Without Learnable Parameters
+>>> m = nn.BatchNorm3d(100, affine=False)
+>>> input = autograd.Variable(torch.randn(20, 100, 35, 45, 10))
+>>> output = m(input)
+```
 ## Recurrent layers
 ### class torch.nn.RNN(* args, ** kwargs)[source]
 
