@@ -738,12 +738,177 @@ for i in range(6):
    output.append(hx)
 ```
 ## Linear layers
+### class torch.nn.Linear(in_features, out_features, bias=True)[source]
+对输入数据进行先行变换。`y = xA + b` （注意：x在前）
 
+参数：
+
+- in_features – 输入样本的特征维度
+- out_features – 样本的输出维度
+- bias – 如果为`false`，不会加上偏置。默认为`True`
+
+形状：
+
+- Input: `(N, in_features)`
+
+- Output: `(N, out_features)`
+
+变量：
+
+- weight – 模块参数，可学习的线性变换的权重`(out_features x in_features)`
+- bias – 模块参数，可学习的线性变换的偏置 `(out_features)`
+
+例子：
+```python
+>>> m = nn.Linear(20, 30)
+>>> input = autograd.Variable(torch.randn(128, 20))
+>>> output = m(input)
+>>> print(output.size())
+
+```
 ## Dropout layers
+### class torch.nn.Dropout(p=0.5, inplace=False)[source]
 
+将`input tensor`随机置零。
+
+参数说明：
+- p – 将`input tensor`随机置零的概率. 默认值为 0.5。
+
+- inplace – 如果设置为`True`将会执行`in-place`操作，默认为`False`。
+
+形状：
+- Input: Any. Input 可以是任何形状
+- Output: Output的形状与输入一样。
+
+例子：
+```python
+>>> m = nn.Dropout(p=0.2)
+>>> input = autograd.Variable(torch.randn(20, 16))
+>>> output = m(input)
+```
+
+### class torch.nn.Dropout2d(p=0.5, inplace=False)[source]
+
+随机将整个`channel`置零。（将某`channel`上的值置零）
+
+通常情况下，input是Conv2D 模块的输出。
+
+论文`Efficient Object Localization Using Convolutional Networks`中提到过，如果`feature maps`之间相邻的像素是强相关的（卷积层的前几层通常会出现这种情况），那么独立同分布的`dropout`不会正则化激活值，还会导致有效的学习率下降。
+>As described in the paper Efficient Object Localization Using Convolutional Networks , if adjacent pixels within feature maps are strongly correlated (as is normally the case in early convolution layers) then iid dropout will not regularize the activations and will otherwise just result in an effective learning rate decrease.
+
+在这种情况下，使用`nn.Dropout2d()`会提高`feature map`间的独立性。
+
+```python
+inputs[i, sampled_c, :, :] = 0
+```
+参数：
+
+- p (float, optional) – 置零的概率
+
+- inplace (bool, optional) – 如果为`True`，将会执行`in-place`操作。
+
+形状：
+
+- Input: `(N, C, H, W)`
+
+- Output: 和输入同形状。
+
+例子：
+```python
+>>> m = nn.Dropout2d(p=0.2)
+>>> input = autograd.Variable(torch.randn(20, 16, 32, 32))
+>>> output = m(input)
+```
+### class torch.nn.Dropout3d(p=0.5, inplace=False)[source]
+
+和上面一样，只不过这个用于3D卷积的输出的。
+```python
+inputs[i, sampled_c, :, :, :] = 0
+```
+
+Parameters:
+p (float, optional) – probability of an element to be zeroed.
+inplace (bool, optional) – If set to True, will do this operation in-place
+Shape:
+Input: \((N, C, D, H, W)\)
+Output: \((N, C, D, H, W)\) (same shape as input)
+
+例子：
+```python
+>>> m = nn.Dropout3d(p=0.2)
+>>> input = autograd.Variable(torch.randn(20, 16, 4, 32, 32))
+>>> output = m(input)
+```
 ## Sparse layers
+### class torch.nn.Embedding(num_embeddings, embedding_dim, padding_idx=None, max_norm=None, norm_type=2, scale_grad_by_freq=False, sparse=False)
+一个简单的`lookup table`，用来保存固定字典长度和`embedding size`的`embeddings`。
+
+这个模块通常用来保存字向量`work vector`,使用索引来获取它们。这个模块的输入是一个 包含 `indices` 的列表，输出是对应的`word embeddings`。
+
+
+参数说明：
+
+- num_embeddings (int) – 要进行`embedding`的字典的大小。
+
+- embedding_dim (int) – `embedding`的维度
+
+- padding_idx (int, optional) – 不知道这是干嘛的。If given, pads the output with zeros whenever it encounters the index.
+
+- max_norm (float, optional) – 如果提供的话，`pytorch`将会重新正则化以保证`embeddings`的`norm`小于给定的值。
+
+- norm_type (float, optional) – 指定 `p-norm`的`p`值。
+
+- scale_grad_by_freq (boolean, optional) – 如果提供的话，将会使用字典中词的词频来调整计算的梯度。
+
+变量：
+
+- weight (Tensor) – 模块中可学习的权重，shape为`(num_embeddings, embedding_dim)`。
+
+形状：
+
+- Input: Variable of LongTensor (N, W), N = mini-batch, W = `mini-batch`中每个样本的`indices`个数。
+
+- Output: (N, W, embedding_dim)
+
+总的来说：`emb = nn.Embedding(..,..)`创建了一个`embeddings`矩阵，`emb(indices)`来获取相应的`embedding`。
+例子：
+```python
+>>> # an Embedding module containing 10 tensors of size 3
+>>> embedding = nn.Embedding(10, 3)
+>>> # a batch of 2 samples of 4 indices each
+>>> input = Variable(torch.LongTensor([[1,2,4,5],[4,3,2,9]]))
+>>> embedding(input)
+
+Variable containing:
+(0 ,.,.) =
+ -1.0822  1.2522  0.2434
+  0.8393 -0.6062 -0.3348
+  0.6597  0.0350  0.0837
+  0.5521  0.9447  0.0498
+
+(1 ,.,.) =
+  0.6597  0.0350  0.0837
+ -0.1527  0.0877  0.4260
+  0.8393 -0.6062 -0.3348
+ -0.8738 -0.9054  0.4281
+[torch.FloatTensor of size 2x4x3]
+
+>>> # example with padding_idx
+>>> embedding = nn.Embedding(10, 3, padding_idx=0)
+>>> input = Variable(torch.LongTensor([[0,2,0,5]]))
+>>> embedding(input)
+
+Variable containing:
+(0 ,.,.) =
+  0.0000  0.0000  0.0000
+  0.3452  0.4937 -0.9361
+  0.0000  0.0000  0.0000
+  0.0706 -2.1962 -0.6276
+[torch.FloatTensor of size 1x4x3]
+```
 
 ## Distance functions
+
 
 ## Loss functions
 基本用法：
