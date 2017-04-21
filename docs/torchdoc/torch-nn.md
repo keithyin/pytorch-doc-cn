@@ -394,76 +394,113 @@ class MyModule(nn.Module):
 
 ## Normalization layers
 ### class torch.nn.BatchNorm1d(num_features, eps=1e-05, momentum=0.1, affine=True)[source]
+
 Applies Batch Normalization over a 2d or 3d input that is seen as a mini-batch.
+对2D或3D的输入应用`Batch Normalization`。
+$$
+y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * \gamma + \beta
+$$
+对输入mini-batch的每个维度都计算均值和标准差，$\gamma$和$\beta$是可学习的参数向量，大小为`C`，`C`为输入的大小。
 
-\[y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * gamma + beta\]
-The mean and standard-deviation are calculated per-dimension over the mini-batches and gamma and beta are learnable parameter vectors of size C (where C is the input size).
+>The mean and standard-deviation are calculated per-dimension over the mini-batches and gamma and beta are learnable parameter vectors of size C (where C is the input size).
 
-During training, this layer keeps a running estimate of its computed mean and variance. The running sum is kept with a default momentum of 0.1.
+在训练过程中，`BatchNorm`层保存着均值和标准差的`moving average`。计算`moving average`的动量值设置为`0.1`。
 
-During evaluation, this running mean/variance is used for normalization.
+在评估过程中，计算得到的`moving average`将用于标准化。
 
-Parameters:
-num_features – num_features from an expected input of size batch_size x num_features [x width]
-eps – a value added to the denominator for numerical stability. Default: 1e-5
-momentum – the value used for the running_mean and running_var computation. Default: 0.1
-affine – a boolean value that when set to true, gives the layer learnable affine parameters.
+形参说明：
+
+- num_features – num_features from an expected input of size batch_size x num_features [x width]
+
+- eps – a value added to the denominator for numerical stability. Default: 1e-5
+
+- momentum – the value used for the running_mean and running_var computation. Default: 0.1
+
+- affine – 是否给这层一个可学习的彷射参数。默认为`True`。
+
 Shape:
-Input: \((N, C)\) or \((N, C, L)\)
-Output: \((N, C)\) or \((N, C, L)\) (same shape as input)
-Examples
 
+- Input: `(N, C)` 或者 `(N, C, L)`
+
+- Output: `(N, C)` or `(N, C, L)` 和输入同维度
+
+例子：
+```python
 >>> # With Learnable Parameters
 >>> m = nn.BatchNorm1d(100)
 >>> # Without Learnable Parameters
 >>> m = nn.BatchNorm1d(100, affine=False)
 >>> input = autograd.Variable(torch.randn(20, 100))
 >>> output = m(input)
-### class torch.nn.BatchNorm2d(num_features, eps=1e-05, momentum=0.1, affine=True)[source]
-Applies Batch Normalization over a 4d input that is seen as a mini-batch of 3d inputs
+```
 
-\[y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * gamma + beta\]
+### class torch.nn.BatchNorm2d(num_features, eps=1e-05, momentum=0.1, affine=True)[source]
+
+对一个4D输入加上一个`BatchNorm`，`4D`的输入看做为一个`3D`特征组成的`mini-batch`。
+
+$$
+y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * \gamma + \beta
+$$
+对mini-batches的每维都计算
 The mean and standard-deviation are calculated per-dimension over the mini-batches and gamma and beta are learnable parameter vectors of size C (where C is the input size).
 
 During training, this layer keeps a running estimate of its computed mean and variance. The running sum is kept with a default momentum of 0.1.
 
 During evaluation, this running mean/variance is used for normalization.
 
-Parameters:
-num_features – num_features from an expected input of size batch_size x num_features x height x width
-eps – a value added to the denominator for numerical stability. Default: 1e-5
-momentum – the value used for the running_mean and running_var computation. Default: 0.1
-affine – a boolean value that when set to true, gives the layer learnable affine parameters.
-Shape:
-Input: \((N, C, H, W)\)
-Output: \((N, C, H, W)\) (same shape as input)
-Examples
+形参说明：
 
+- num_features – `Channel`的个数
+
+- eps – a value added to the denominator for numerical stability. Default: 1e-5
+
+- momentum – the value used for the running_mean and running_var computation. Default: 0.1
+
+- affine – a boolean value that when set to true, gives the layer learnable affine parameters.
+
+形状：
+- Input: `(N, C, H, W)`
+
+- Output: `(N, C, H, W)` (same shape as input)
+
+例子：
+```python
 >>> # With Learnable Parameters
 >>> m = nn.BatchNorm2d(100)
 >>> # Without Learnable Parameters
 >>> m = nn.BatchNorm2d(100, affine=False)
 >>> input = autograd.Variable(torch.randn(20, 100, 35, 45))
 >>> output = m(input)
+```
 ### class torch.nn.BatchNorm3d(num_features, eps=1e-05, momentum=0.1, affine=True)[source]
+
 Applies Batch Normalization over a 5d input that is seen as a mini-batch of 4d inputs
 
-\[y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * gamma + beta\]
+$$
+y = \frac{x - mean[x]}{ \sqrt{Var[x]} + \epsilon} * \gamma + \beta
+$$
 The mean and standard-deviation are calculated per-dimension over the mini-batches and gamma and beta are learnable parameter vectors of size C (where C is the input size).
 
 During training, this layer keeps a running estimate of its computed mean and variance. The running sum is kept with a default momentum of 0.1.
 
 During evaluation, this running mean/variance is used for normalization.
 
-Parameters:
-num_features – num_features from an expected input of size batch_size x num_features x depth x height x width
-eps – a value added to the denominator for numerical stability. Default: 1e-5
-momentum – the value used for the running_mean and running_var computation. Default: 0.1
-affine – a boolean value that when set to true, gives the layer learnable affine parameters.
+实参说明：
+- num_features – （`channel` 的个数）num_features from an expected input of size batch_size x num_features x depth x height x width
+
+- eps – a value added to the denominator for numerical stability. Default: 1e-5
+
+- momentum – the value used for the running_mean and running_var computation. Default: 0.1
+
+- affine – a boolean value that when set to true, gives the layer learnable affine parameters.
+
 Shape:
-Input: \((N, C, D, H, W)\)
-Output: \((N, C, D, H, W)\) (same shape as input)
-Examples
+
+- Input: `(N, C, D, H, W)`
+
+- Output: `(N, C, D, H, W)` (same shape as input)
+
+例子：
 ```python
 >>> # With Learnable Parameters
 >>> m = nn.BatchNorm3d(100)
