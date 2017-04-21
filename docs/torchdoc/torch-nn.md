@@ -1460,8 +1460,9 @@ All RNN modules accept packed sequences as inputs.
 - batch_sizes (list[int]) – 包含 `mini-batch` 中每个序列长度的列表。
 
 #### torch.nn.utils.rnn.pack_padded_sequence(input, lengths, batch_first=False)[source]
-Packs a Variable containing padded sequences of variable length.
-把一个包含 填充过的变长序列 `Variable`打包。
+
+这里的`pack`，理解成压紧比较好。
+将一个 填充过的变长序列 压紧。（填充时候，会有冗余，所以压紧一下）
 
 输入的形状可以是(T×B×* )。`T`是最长序列长度，`B`是`batch size`，`*`代表任意维度(可以是0)。如果`batch_first=True`的话，那么相应的 `input size` 就是 `(B×T×*)`。
 
@@ -1484,8 +1485,8 @@ Packs a Variable containing padded sequences of variable length.
 
 ### torch.nn.utils.rnn.pad_packed_sequence(sequence, batch_first=False)[source]
 
-填充变长序列的打包的batch
-Pads a packed batch of variable length sequences.
+填充`packed_sequence`
+
 这个操作和pack_padded_sequence()是相反的。
 
 返回的Varaible的值的`size`是 `T×B×*`, `T` 是最长序列的长度，`B` 是 batch_size,如果 `batch_first=True`,那么返回值是`B×T×*`。
@@ -1501,3 +1502,5 @@ Batch中的元素将会以它们长度的逆序排列。
 
 返回值:
 一个tuple，包含被填充后的序列，和batch中序列的长度列表。
+
+[关于packed_sequence](https://discuss.pytorch.org/t/how-can-i-compute-seq2seq-loss-using-mask/861)
