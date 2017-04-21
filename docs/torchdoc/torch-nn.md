@@ -1485,9 +1485,9 @@ All RNN modules accept packed sequences as inputs.
 
 ### torch.nn.utils.rnn.pad_packed_sequence(sequence, batch_first=False)[source]
 
-填充`packed_sequence`
+填充`packed_sequence`。
 
-这个操作和pack_padded_sequence()是相反的。
+上面提到的函数的功能是将一个填充后的变长序列压紧。 这个操作和pack_padded_sequence()是相反的。把压紧的序列再填充回来。
 
 返回的Varaible的值的`size`是 `T×B×*`, `T` 是最长序列的长度，`B` 是 batch_size,如果 `batch_first=True`,那么返回值是`B×T×*`。
 
