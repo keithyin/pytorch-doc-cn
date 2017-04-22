@@ -1503,4 +1503,34 @@ Batch中的元素将会以它们长度的逆序排列。
 返回值:
 一个tuple，包含被填充后的序列，和batch中序列的长度列表。
 
+例子：
+```python
+import torch
+import torch.nn as nn
+from torch.autograd import Variable
+from torch.nn import utils as nn_utils
+batch_size = 2
+max_length = 3
+hidden_size = 2
+n_layers =1
+
+tensor_in = torch.FloatTensor([[1, 2, 3], [1, 0, 0]]).resize_(2,3,1)
+tensor_in = Variable( tensor_in ) #[batch, seq, feature], [2, 3, 1]
+seq_lengths = [3,1] # list of integers holding information about the batch size at each sequence step
+
+# pack it
+pack = nn_utils.rnn.pack_padded_sequence(tensor_in, seq_lengths, batch_first=True)
+
+# initialize
+rnn = nn.RNN(1, hidden_size, n_layers, batch_first=True)
+h0 = Variable(torch.randn(n_layers, batch_size, hidden_size))
+
+#forward
+out, _ = rnn(pack, h0)
+
+# unpack
+unpacked = nn_utils.rnn.pad_packed_sequence(out)
+print(unpacked)
+```
+
 [关于packed_sequence](https://discuss.pytorch.org/t/how-can-i-compute-seq2seq-loss-using-mask/861)
