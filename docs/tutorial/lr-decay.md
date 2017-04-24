@@ -21,3 +21,6 @@ optim.SGD([
                 {'params': model.classifier.parameters(), 'lr': 1e-3}
             ], lr=1e-2, momentum=0.9)
 ```
+
+## 参考资料
+[https://discuss.pytorch.org/t/adaptive-learning-rate/320/4](https://discuss.pytorch.org/t/adaptive-learning-rate/320/4)
