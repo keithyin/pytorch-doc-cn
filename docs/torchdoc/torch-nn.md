@@ -18,7 +18,7 @@
 
 ## Containers（容器）：
 ### class torch.nn.Module
-所有神经网络的基类。
+所有网络的基类。
 
 你的模型也应该继承这个类。
 
