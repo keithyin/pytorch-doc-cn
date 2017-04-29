@@ -1459,7 +1459,7 @@ All RNN modules accept packed sequences as inputs.
 
 - batch_sizes (list[int]) – 包含 `mini-batch` 中每个序列长度的列表。
 
-#### torch.nn.utils.rnn.pack_padded_sequence(input, lengths, batch_first=False)[source]
+### torch.nn.utils.rnn.pack_padded_sequence(input, lengths, batch_first=False)[source]
 
 这里的`pack`，理解成压紧比较好。
 将一个 填充过的变长序列 压紧。（填充时候，会有冗余，所以压紧一下）
