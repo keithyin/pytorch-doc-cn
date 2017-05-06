@@ -21,7 +21,7 @@ torch.Size([1, 1, 12, 12])
 
 填充`Tensor`.
 
-目前为止,只支持`2D`和`3D`填充.
+目前为止,只支持`2D`和`3D`填充.**对于4D数据的最后两维填充，或者对于5D数据的最后三维数据填充。**
 Currently only 2D and 3D padding supported.
 当输入为`4D Tensor`的时候,`pad`应该是一个4元素的`tuple (pad_l, pad_r, pad_t, pad_b )` ,当输入为`5D Tensor`的时候,`pad`应该是一个6元素的`tuple (pleft, pright, ptop, pbottom, pfront, pback)`.
 
