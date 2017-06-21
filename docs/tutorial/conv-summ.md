@@ -81,3 +81,27 @@ res = conv1d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1
   - 正向的`group`
 - dilation
   - 正向的`dilation`
+
+
+## 卷积后的feature map的大小的计算
+
+**先考虑 dilation=1 的情况， 就是我么最常用的情况**
+
+Lout=floor((Lin+2∗padding−dilation∗(kernel_size−1)−1)/stride+1)
+
+$$
+L_{out} = floor\Biggr(\frac{L_{in}+2∗padding−kernel\_size}{stride}+1\Biggr)
+$$
+
+其中： 
+
+* $L_{in}+2*padding$ 是 pad后的 输入 featuremap 的大小。
+* 用 `floor` 的原因是， 如果剩余的部分不够卷积运算卷的，就忽略
+
+**再看看有 dilation 的情况：**
+如果有了 dilation后， 那么 kernel_size 就变成了 $$kernel\_size=dilation∗(kernel\_size−1)+1$$
+
+所以，通用的公式是
+$$
+L_{out} = floor\Biggr(\frac{L_{in}+2∗padding−\Bigr(dilation∗(kernel\_size−1)+1\Bigr)}{stride}+1\Biggr)
+$$
